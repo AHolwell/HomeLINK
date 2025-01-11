@@ -10,7 +10,7 @@ It will deploy resources to your AWS account, and as such will need an AWS profi
 ### Hosted Version
 // TODO maybe just get the aholwell domain to not worry about it being the nuvola consulting one
 
-I will host the app at :
+I will host the app at:
 
 * API: ```api.homelink.nuvolaconsulting.co.uk```
 
@@ -20,7 +20,7 @@ I will host the app at :
 
 1. [Configure an AWS profile](https://docs.aws.amazon.com/cli/v1/userguide/cli-configure-files.html) following your preffered method.
 
-2. Install root packages
+2. Install packages
 ```
    $ git clone https://github.com/AHolwell/HomeLINK.git
    $ cd HomeLINK
@@ -68,6 +68,11 @@ $ npx aws-api-gateway-cli-test \
   --body='{}'
 ```
 
+## My Approach
+### Assumptions
+
+* Though real time, the data is updated infrequently - ie, not streaming air quality every 1 second to table.
+* TO simulate real world, device categories with the same functions -ie lights - could be registered with different models
 
 ## The Task Description
 

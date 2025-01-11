@@ -33,6 +33,7 @@ describe('deviceFactories', () => {
     expect(lightDevice).toEqual({
       userId: 'test-identity-id',
       deviceId: '12345-abcde',
+      deviceCategory: 'Light',
       reigisteredAt: 10,
       deviceName: 'Test Light',
       isPowered: true,
@@ -52,6 +53,7 @@ describe('deviceFactories', () => {
     expect(carbonMonitorDevice).toEqual({
       userId: 'test-identity-id',
       deviceId: '12345-abcde',
+      deviceCategory: 'CarbonMonitor',
       reigisteredAt: 10,
       deviceName: 'Test Monitor',
       isPowered: true,

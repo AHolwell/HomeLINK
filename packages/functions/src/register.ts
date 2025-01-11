@@ -4,7 +4,7 @@ import { PutCommand, DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
 import { APIGatewayProxyEvent } from "aws-lambda";
 import { Util } from "@homelink/core/util";
 import { createDevice } from "@homelink/core/devices";
-import { Device } from "@homelink/core/devices/device-factory";
+import { Device } from "@homelink/core/devices/types";
 
 const dynamoDb = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 

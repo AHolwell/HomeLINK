@@ -1,27 +1,7 @@
 import { APIGatewayProxyEvent } from "aws-lambda";
 import { EventBody } from ".";
 import * as uuid from "uuid";
-
-export type BaseDevice = {
-    userId: string
-    deviceId: string
-    reigisteredAt: number
-    deviceName?: string //Option for user to give device a name
-    isPowered: boolean
-}
-
-export type Light = BaseDevice & {
-    modelType: string // User Given
-    colour: string
-    intensity: number
-}
-
-export type CarbonMonitor = BaseDevice & {
-    modelType: string // User Given
-    alarmThreshold: number
-}
-
-export type Device = Light | CarbonMonitor
+import { CarbonMonitor, Device, Light } from "./types";
 
 type DeviceConstructor<T extends Device> = (event: APIGatewayProxyEvent, body: EventBody) => T;
 
@@ -31,6 +11,7 @@ export const deviceFactories: Record<string, DeviceConstructor<Device>> = {
     Light: (event: any, body: EventBody): Light => ({
         userId: event.requestContext.authorizer?.iam.cognitoIdentity.identityId,
         deviceId: uuid.v1(),
+        deviceCategory: "Light",
         reigisteredAt: Date.now(),
         deviceName: body?.deviceName ?? "",
         isPowered: true,
@@ -41,6 +22,7 @@ export const deviceFactories: Record<string, DeviceConstructor<Device>> = {
     CarbonMonitor: (event: any, body: EventBody): CarbonMonitor => ({
         userId: event.requestContext.authorizer?.iam.cognitoIdentity.identityId,
         deviceId: uuid.v1(),
+        deviceCategory: "CarbonMonitor",
         reigisteredAt: Date.now(),
         deviceName: body?.deviceName ?? "",
         isPowered: true,
@@ -48,3 +30,4 @@ export const deviceFactories: Record<string, DeviceConstructor<Device>> = {
         alarmThreshold: 220,
     }),
 };
+

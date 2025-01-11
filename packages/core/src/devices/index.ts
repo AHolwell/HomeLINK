@@ -1,5 +1,6 @@
 import { APIGatewayProxyEvent } from "aws-lambda";
-import { Device, deviceFactories } from "./device-factory";
+import { deviceFactories } from "./device-factory";
+import { categoryUpdatableFields, Device, updateableBaseFields } from "./types";
 
 export type EventBody = {
     deviceName?: string
@@ -21,6 +22,7 @@ export const createDevice = <T extends Device>(event: APIGatewayProxyEvent): T =
 export const getDeviceType = (modelType: string) => {
     // In a use real case I would opt for a centrally managed mapping system/single source of truth - presumably we'd have a database of different devices and models that we could use for lookup.
     // Though hard codeing here works for PoC/demonstration purposes
+    // Basing off model type rather than device category wo we could cleanly trigger logic specific to a model type if wanted
     switch (modelType) {
         // Light model Types
         case "LED":
@@ -28,7 +30,7 @@ export const getDeviceType = (modelType: string) => {
             return "Light"
         // Monitor model types
         case "CO":
-        case "CO":
+        case "CO2":
             return "CarbonMonitor"
         // No match
         default:
@@ -45,4 +47,31 @@ export const validateBody = (event: APIGatewayProxyEvent): EventBody => {
         throw new Error('No model type was provided')
     }
     return body
+}
+
+export const getUpdatableFields = (deviceCategory: string) => {
+    return [...updateableBaseFields, ...categoryUpdatableFields[deviceCategory]]
+}
+
+export const constructUpdateExpressions = (allowedFields: string[], bodyString: string) => {
+    const body = JSON.parse(bodyString);
+    let updateExpression: string = "SET "
+    let invalidFields: string[] = []
+
+    Object.keys(body).forEach((key) => {
+        if (allowedFields.includes(key)) {
+            updateExpression += `${key} = :${key} `
+        } else {
+            invalidFields.push(key)
+        }
+    })
+
+    if (invalidFields.length > 0) {
+        throw new Error(`You cannot update the following fields: ${invalidFields.join(', ')}`)
+    }
+
+    const expressionAttributeValues = Object.fromEntries(
+        Object.entries(body).map(([key, value]) => [`:${key}`, value])
+    );
+    return { updateExpression, expressionAttributeValues }
 }
