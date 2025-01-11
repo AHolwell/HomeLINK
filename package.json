@@ -1,5 +1,5 @@
 {
-  "name": "monorepo-template",
+  "name": "homelink",
   "version": "0.0.0",
   "workspaces": [
     "packages/*"
@@ -10,6 +10,7 @@
     "typescript": "^5"
   },
   "dependencies": {
-    "sst": "^3"
+    "aws-api-gateway-cli-test": "^1.3.2",
+    "sst": "^3.3.71"
   }
 }

@@ -1,81 +1,114 @@
-# Monorepo Template
+# HomeLink Interview Task
 
-A template to create a monorepo SST v3 project. [Learn more](https://sst.dev/docs/set-up-a-monorepo).
+
+### Warning!
+
+This project uses the SST framework.
+
+It will deploy resources to your AWS account, and as such will need an AWS profile with sufficient IAM permissions to provision.
+
+### Hosted Version
+// TODO maybe just get the aholwell domain to not worry about it being the nuvola consulting one
+
+I will host the app at :
+
+* API: ```api.homelink.nuvolaconsulting.co.uk```
+
+* Frontend: ```homelink.nuvolaconsulting.co.uk```
 
 ## Get started
 
-1. Use this template to [create your own repo](https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-repository-from-a-template).
+1. [Configure an AWS profile](https://docs.aws.amazon.com/cli/v1/userguide/cli-configure-files.html) following your preffered method.
 
-2. Clone the new repo.
+2. Install root packages
+```
+   $ git clone https://github.com/AHolwell/HomeLINK.git
+   $ cd HomeLINK
+   $ npm install
+```
 
-   ```bash
-   git clone MY_APP
-   cd MY_APP
-   ```
+3. In `./sst.config.ts` replace the profile name with the one you set up.
 
-3. Rename the files in the project to the name of your app.
+```
+providers: {
+        aws: {
+          region: "eu-west-2",
+          profile: "<YOUR_PROFILE_NAME>"
+        }
+      }
+```
 
-   ```bash
-   npx replace-in-file '/monorepo-template/g' 'MY_APP' '**/*.*' --verbose
-   ```
-
-4. Deploy!
-
-   ```bash
-   npm install
-   npx sst deploy
-   ```
-
-5. Optionally, enable [_git push to deploy_](https://sst.dev/docs/console/#autodeploy).
+4. In `./infra/api.ts` replace the domain with one you have set up a hosted zone for in route 53 - alternatively remove the line to use an AWS generated domain.
+```
+domain: $app.stage === "production" ? "api.homelink.<YOUR_DOMAIN>" : undefined,
+```
 
 ## Usage
 
-This template uses [npm Workspaces](https://docs.npmjs.com/cli/v8/using-npm/workspaces). It has 3 packages to start with and you can add more it.
+To test the endpoints, as they are behind IAM auth I reccomend using [AWS API Gateway Test CLI](https://github.com/AnomalyInnovations/aws-api-gateway-cli-test)
 
-1. `core/`
+Please find detailed commands in ```commands.md```
 
-   This is for any shared code. It's defined as modules. For example, there's the `Example` module.
+Run the unit tests within the package - havent set up doing it from root *** TODO maybe? *** 
 
-   ```ts
-   export module Example {
-     export function hello() {
-       return "Hello, world!";
-     }
-   }
-   ```
+*** TODO: Check if it uses a different userpool for prod ***
 
-   That you can use across other packages using.
+```
+$ npx aws-api-gateway-cli-test \
+  --username='<USERNAME>' \
+  --password='<PASSWORD>' \
+  --user-pool-id='eu-west-2_wwABMsyxN' \
+  --app-client-id='e3v17bmfascm2uja498pjrfg1' \
+  --cognito-region='eu-west-2' \
+  --identity-pool-id='eu-west-2:8592e0b9-3b7c-4564-ba15-4bf19d1665b2' \
+  --invoke-url='dev.api.homelink.nuvolaconsulting.co.uk' \
+  --api-gateway-region='eu-west-2' \
+  --path-template='/devices' \
+  --method='POST' \
+  --body='{}'
+```
 
-   ```ts
-   import { Example } from "@aws-monorepo/core/example";
 
-   Example.hello();
-   ```
+## The Task Description
 
-   We also have [Vitest](https://vitest.dev/) configured for testing this package with the `sst shell` CLI.
+### Overview
 
-   ```bash
-   npm test
-   ```
+Welcome to the future of home automation! Your mission is to build a backend system acting as the central hub for managing IoT devices in a smart home environment. These IoT devices might include anything from smart lights to thermostats or security cameras. Your task is to create a RESTful web API that allows users to manage these devices, monitor their status, and control them remotely.
 
-2. `functions/`
+This task is designed to test your ability to design and implement a backend system with a focus on RESTful APIs, managing state, and handling real-time data in an IoT context.
+Objectives:
 
-   This is for your Lambda functions and it uses the `core` package as a local dependency.
+* Create IoT Device Management API:
 
-3. `scripts/`
+* Register a New Device:
+   * Create an endpoint to register a new IoT device. The API should accept the necessary details to uniquely identify and describe the device.
+            The response should return the details of the registered device, including a unique identifier.
 
-    This is for any scripts that you can run on your SST app using the `sst shell` CLI and [`tsx`](https://www.npmjs.com/package/tsx). For example, you can run the example script using:
+* List All Devices:
+   * Implement an endpoint to retrieve a list of all registered devices. This endpoint should return a summary of each device's details.
 
-   ```bash
-   npm run shell src/example.ts
-   ```
+* Get Device Details:
+   * Create an endpoint to retrieve the details of a specific device by its unique identifier.
 
-### Infrastructure
+* Update Device Status:
+   * Provide an endpoint to update the status or configuration of a specific device. This could be used, for example, to turn a light on or off, adjust a thermostat, etc.
+   * The response should confirm the updated status or configuration.
 
-The `infra/` directory allows you to logically split the infrastructure of your app into separate files. This can be helpful as your app grows.
+* Delete a Device:
+   * Implement an endpoint to delete a specific device from the system. The response should confirm the deletion.
 
-In the template, we have an `api.ts`, and `storage.ts`. These export the created resources. And are imported in the `sst.config.ts`.
+### Requirements:
 
----
+* Use any backend technology stack you are comfortable with (e.g., Node.js, Python, Ruby, etc.).
+* Use any form of data storage (in-memory database, relational database, file storage, etc.) to manage device state and history.
+* Write clean, maintainable code with appropriate documentation.
+* Include error handling for common edge cases (e.g., invalid device IDs, bad input data).
 
-**Join our community** [Discord](https://sst.dev/discord) | [YouTube](https://www.youtube.com/c/sst-dev) | [X.com](https://x.com/SST_dev)
+### Deliverables:
+
+* A link to your public GitHub repository with the project code.
+* A README file with instructions on how to run the project, including any assumptions you made.
+* (Optional) A brief summary of your approach and any interesting challenges you encountered.
+
+
+Good luck on your mission to make smart homes even smarter! The future of home automation is in your hands.

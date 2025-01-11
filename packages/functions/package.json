@@ -1,9 +1,11 @@
 {
-  "name": "@monorepo-template/functions",
+  "name": "@homelink/functions",
   "version": "0.0.0",
   "type": "module",
   "dependencies": {
-    "@monorepo-template/core": "*",
+    "@aws-sdk/client-dynamodb": "^3.726.1",
+    "@aws-sdk/lib-dynamodb": "^3.726.1",
+    "@homelink/core": "*",
     "sst": "*"
   },
   "devDependencies": {
