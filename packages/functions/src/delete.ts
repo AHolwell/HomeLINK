@@ -7,15 +7,15 @@ import { APIGatewayProxyEvent } from "aws-lambda";
 const dynamoDb = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 
 export const main = Util.handler(async (event: APIGatewayProxyEvent) => {
-  const params = {
-    TableName: Resource.Devices.name,
-    Key: {
-      userId: event.requestContext.authorizer?.iam.cognitoIdentity.identityId, // The id of the author
-      deviceId: event?.pathParameters?.id, // The id of the note from the path
-    },
-  };
+    const params = {
+        TableName: Resource.Devices.name,
+        Key: {
+            userId: event.requestContext.authorizer?.iam.cognitoIdentity.identityId, // The id of the author
+            deviceId: event?.pathParameters?.id, // The id of the note from the path
+        },
+    };
 
-  await dynamoDb.send(new DeleteCommand(params));
+    await dynamoDb.send(new DeleteCommand(params));
 
-  return JSON.stringify({ status: true });
+    return JSON.stringify({ status: true });
 });
