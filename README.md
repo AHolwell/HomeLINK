@@ -1,11 +1,5 @@
 # HomeLink Interview Task
 
-**_ TODO: Create Errors ENUM for a bit cleaner code _**
-
-**_ TODO maybe just get the aholwell domain to not worry about it being the nuvola consulting one _**
-
-**_ TODO rate limit API _**
-
 ### Warning!
 
 This project uses the [SST framework](https://sst.dev/).
@@ -18,11 +12,13 @@ I will host the app at:
 
 - API: `api.homelink.nuvolaconsulting.co.uk`
 
-- Frontend: `homelink.nuvolaconsulting.co.uk`
-
 ## Get started
 
-1. [Configure an AWS profile](https://docs.aws.amazon.com/cli/v1/userguide/cli-configure-files.html) following your preffered method.
+1. Configure an AWS profile
+
+```
+   $ aws configure sso
+```
 
 2. Clone repo and install packages
 
@@ -117,6 +113,7 @@ Note: The tests are ran via SST scripts, which means you'll need to have configu
 - Though real time, the data is updated infrequently - ie. we're not streaming real time updates every second, but keeping track of things that change a few times a day.
 - To simulate real world, device categories with the same functions -ie lights - could be registered with different models rather than just as 'lights'
 - All devices will have a model type, and then an over arching category such as 'Light' which has shared functionality across those models.
+- User has AWS CLI and account set up for usage.
 
 ### Tech
 

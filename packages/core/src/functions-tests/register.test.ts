@@ -6,6 +6,7 @@ import { mockClient } from "aws-sdk-client-mock";
 import { toHaveReceivedCommandWith } from "aws-sdk-client-mock-vitest";
 import { Resource } from "sst";
 
+//Mock dynamo and other imports
 expect.extend({ toHaveReceivedCommandWith });
 const client = mockClient(DynamoDBDocumentClient);
 client.on(PutCommand).resolves({});
@@ -20,6 +21,7 @@ vi.mock("@homelink/core/devices", () => ({
 
 describe("list lambda", () => {
   it("happy path", async () => {
+    //Arrange
     const event: APIGatewayProxyEvent = {
       requestContext: {
         authorizer: {
@@ -32,8 +34,10 @@ describe("list lambda", () => {
       },
     } as unknown as APIGatewayProxyEvent;
 
+    //Act
     const response = await main(event, {} as Context);
 
+    //Assert
     expect(client).toHaveReceivedCommandWith(PutCommand, {
       TableName: Resource.Devices.name,
       Item: {

@@ -8,11 +8,19 @@ import {
   GetCommandOutput,
 } from "@aws-sdk/lib-dynamodb";
 import { APIGatewayProxyEvent } from "aws-lambda";
-import { validateId } from "@homelink/core/input-vaidation";
+import { validateId } from "@homelink/core/input-validation";
 import { Errors, ValidationError } from "@homelink/core/errors";
 
 const dynamoDb = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 
+/**
+ * Get endpoint lambda handler
+ *
+ * Pulls the Id from the routing, and attempts to retireve that item, and present details to user
+ *
+ * @param event the API Gateway Event
+ * @returns the full item object
+ */
 export const main = Util.handler(async (event: APIGatewayProxyEvent) => {
   const id: string = validateId(event?.pathParameters?.id);
 

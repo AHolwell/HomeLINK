@@ -2,12 +2,14 @@ import { api } from "./api";
 
 const region = aws.getRegionOutput().name;
 
+// Set up user pool
 export const userPool = new sst.aws.CognitoUserPool("UserPool", {
-  usernames: ["email"]
+  usernames: ["email"],
 });
 
 export const userPoolClient = userPool.addClient("UserPoolClient");
 
+// Set up identity pool, connected to user pool and allowing API access
 export const identityPool = new sst.aws.CognitoIdentityPool("IdentityPool", {
   userPools: [
     {
@@ -17,10 +19,9 @@ export const identityPool = new sst.aws.CognitoIdentityPool("IdentityPool", {
   ],
   permissions: {
     authenticated: [
+      // Allow the users to access the defined api gateway only
       {
-        actions: [
-          "execute-api:*",
-        ],
+        actions: ["execute-api:*"],
         resources: [
           $concat(
             "arn:aws:execute-api:",
@@ -29,7 +30,7 @@ export const identityPool = new sst.aws.CognitoIdentityPool("IdentityPool", {
             aws.getCallerIdentityOutput({}).accountId,
             ":",
             api.nodes.api.id,
-            "/*/*/*"
+            "/*/*/*",
           ),
         ],
       },

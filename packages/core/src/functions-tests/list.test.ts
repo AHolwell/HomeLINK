@@ -5,12 +5,13 @@ import {
   GetCommand,
   QueryCommand,
 } from "@aws-sdk/lib-dynamodb";
-import { validateId } from "@homelink/core/input-vaidation";
+import { validateId } from "../input-validation";
 import { main } from "@homelink/functions/src/list";
 import { mockClient } from "aws-sdk-client-mock";
 import { toHaveReceivedCommandWith } from "aws-sdk-client-mock-vitest";
 import { Resource } from "sst";
 
+//Mock dynamo and other imports
 expect.extend({ toHaveReceivedCommandWith });
 const client = mockClient(DynamoDBDocumentClient);
 client.on(QueryCommand).resolves({
@@ -28,6 +29,7 @@ client.on(QueryCommand).resolves({
 
 describe("list lambda", () => {
   it("happy path", async () => {
+    //Arrange
     const event: APIGatewayProxyEvent = {
       pathParameters: {
         id: "1234",
@@ -43,8 +45,10 @@ describe("list lambda", () => {
       },
     } as unknown as APIGatewayProxyEvent;
 
+    //Act
     const response = await main(event, {} as Context);
 
+    //Assert
     expect(client).toHaveReceivedCommandWith(QueryCommand, {
       TableName: Resource.Devices.name,
       KeyConditionExpression: "userId = :userId",

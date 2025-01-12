@@ -13,19 +13,20 @@ import {
   constructUpdateExpressions,
   getUpdatableFields,
 } from "@homelink/core/devices";
-import { validateId } from "@homelink/core/input-vaidation";
+import { validateId } from "@homelink/core/input-validation";
 import { Errors, ValidationError } from "@homelink/core/errors";
 
 const dynamoDb = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 
-// I want to allow the update body to allow any combination of valid fields for that device
-// {
-//      fieldToBeUpdated: fieldToBeUpdated
-// }
-// get the current device type
-// so I need to validate the fields to be updated exist on the type of device that it is
-// contstruct the update request
-
+/**
+ * Update endpoint lambda handler
+ *
+ * Accepts a stringified body object of the fields the user is updating
+ * eg.{colour: red, intensity: 70}
+ *
+ * @param event the API Gateway Event
+ * @returns true when the item has been updated
+ */
 export const main = Util.handler(async (event: APIGatewayProxyEvent) => {
   if (!event.body) {
     // Full validation is done later when constructing the expression, its worth checking for empty body first though to avoid unnecessary table requests
@@ -39,7 +40,7 @@ export const main = Util.handler(async (event: APIGatewayProxyEvent) => {
 
     Key: {
       userId: event.requestContext.authorizer?.iam.cognitoIdentity.identityId,
-      deviceId: id, // Specified in body of request
+      deviceId: id,
     },
   };
 
@@ -52,12 +53,11 @@ export const main = Util.handler(async (event: APIGatewayProxyEvent) => {
     throw new Error("Device category not found");
   }
 
+  // Update the item with new values
   const allowedFields = getUpdatableFields(getResult.Item?.deviceCategory);
 
   const { updateExpression, expressionAttributeValues } =
     constructUpdateExpressions(allowedFields, event.body);
-
-  console.log(updateExpression, expressionAttributeValues);
 
   const updateParams: UpdateCommandInput = {
     TableName: Resource.Devices.name,

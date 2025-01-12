@@ -12,7 +12,7 @@ npx aws-api-gateway-cli-test \
   --api-gateway-region='eu-west-2' \
   --path-template='/devices' \
   --method='POST' \
-  --body='{"modelType": "LED", "deviceName": "MyLED"}'
+  --body='{"modelType": "CO", "deviceName": "MyCOMon"}'
 ```
 
 #### List all
@@ -62,7 +62,7 @@ npx aws-api-gateway-cli-test \
   --api-gateway-region='eu-west-2' \
   --path-template='/devices/{id}' \
   --method='PUT' \
-  --params='{"id": "c7719ac0-d0f9-11ef-8182-1b012c422b70"}' \
+  --params='{"id": "d969e820-d0fb-11ef-bd87-cf2f6d616065"}' \
   --body='{"colour": "Red"}'
 ```
 

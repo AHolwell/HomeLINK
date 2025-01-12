@@ -4,11 +4,9 @@ import * as uuid from "uuid";
 import { deviceFactories } from "../device-factory";
 
 describe("deviceFactories", () => {
-  const uuidMock = vi.spyOn(uuid, "v1").mockReturnValue("12345-abcde");
+  vi.spyOn(uuid, "v1").mockReturnValue("12345-abcde");
+  vi.spyOn(Date, "now").mockReturnValue(10);
 
-  const dateNowMock = vi.spyOn(Date, "now").mockReturnValue(10);
-
-  // Mock event and body for testing
   const mockEvent: APIGatewayProxyEvent = {
     requestContext: {
       authorizer: {
@@ -22,14 +20,17 @@ describe("deviceFactories", () => {
     body: JSON.stringify({ modelType: "Light", deviceName: "Test Light" }),
   } as unknown as APIGatewayProxyEvent;
 
-  const mockBody = {
-    modelType: "Light Model",
-    deviceName: "Test Light",
-  };
-
   it("should create a Light device with correct fields", () => {
+    // Arrange
+    const mockBody = {
+      modelType: "Light Model",
+      deviceName: "Test Light",
+    };
+
+    // Act
     const lightDevice = deviceFactories["Light"](mockEvent, mockBody);
 
+    // Assert
     expect(lightDevice).toEqual({
       userId: "test-identity-id",
       deviceId: "12345-abcde",
@@ -44,15 +45,19 @@ describe("deviceFactories", () => {
   });
 
   it("should create a CarbonMonitor device with correct fields", () => {
+    // Arrange
     const carbonMonitorBody = {
       modelType: "CarbonMonitor Model",
       deviceName: "Test Monitor",
     };
+
+    // Act
     const carbonMonitorDevice = deviceFactories["CarbonMonitor"](
       mockEvent,
       carbonMonitorBody,
     );
 
+    // Assert
     expect(carbonMonitorDevice).toEqual({
       userId: "test-identity-id",
       deviceId: "12345-abcde",

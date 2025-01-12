@@ -1,5 +1,9 @@
 import { describe, it, expect } from "vitest";
-import { missingFieldError, nonUpdatableFieldsError } from "..";
+import {
+  invalidValuesError,
+  missingFieldError,
+  nonUpdatableFieldsError,
+} from "..";
 
 describe("missingFieldError", () => {
   it.each([
@@ -11,7 +15,9 @@ describe("missingFieldError", () => {
   ])(
     "should return the correct error message for field: %s",
     (field, expectedMessage) => {
+      //Act
       const result = missingFieldError(field);
+      //Assert
       expect(result).toBe(expectedMessage);
     },
   );
@@ -27,7 +33,32 @@ describe("nonUpdatableFieldsError", () => {
   ])(
     "should return the correct error message for field: %s",
     (fields, expectedMessage) => {
+      //Act
       const result = nonUpdatableFieldsError(fields);
+      //Assert
+      expect(result).toBe(expectedMessage);
+    },
+  );
+});
+
+describe("invalidValuesError", () => {
+  it.each([
+    [["field1: value1"], "The following values are invalid: field1: value1"],
+    [
+      ["field1: value1", "field2: value2"],
+      "The following values are invalid: field1: value1, field2: value2",
+    ],
+    [
+      ["field1: value1", "field2: value2", "field3: value3"],
+      "The following values are invalid: field1: value1, field2: value2, field3: value3",
+    ],
+  ])(
+    "should return the correct error message for fields: %s",
+    (fields, expectedMessage) => {
+      // Act
+      const result = invalidValuesError(fields);
+
+      // Assert
       expect(result).toBe(expectedMessage);
     },
   );
