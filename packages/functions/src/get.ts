@@ -9,7 +9,7 @@ import {
 } from "@aws-sdk/lib-dynamodb";
 import { APIGatewayProxyEvent } from "aws-lambda";
 import { validateId } from "@homelink/core/input-vaidation";
-import { Errors, ValidationError } from "@homelink/core/errors/errors";
+import { Errors, ValidationError } from "@homelink/core/errors";
 
 const dynamoDb = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 

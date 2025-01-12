@@ -1,11 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { validateId, validateRegisterBody } from "..";
 import { APIGatewayProxyEvent } from "aws-lambda";
-import {
-  Errors,
-  missingFieldError,
-  ValidationError,
-} from "../../errors/errors";
+import { Errors, missingFieldError, ValidationError } from "../../errors";
 import * as uuid from "uuid";
 
 describe("validateRegisterBody", () => {

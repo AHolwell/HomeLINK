@@ -16,8 +16,6 @@ client.on(GetCommand).resolves({
   },
 });
 
-vi.mock("@homelink/core/errors/errors", () => ({}));
-
 vi.mock("@homelink/core/input-vaidation", () => ({
   validateId: vi.fn().mockReturnValue("1234"),
 }));

@@ -1,5 +1,5 @@
 import { Context, APIGatewayProxyEvent } from "aws-lambda";
-import { StatusCode, ValidationError } from "../errors/errors";
+import { StatusCode, ValidationError } from "../errors";
 
 // This is just a wrapper for my lambda functions to avoid repeating the error catching, CORS, and response logic each time.
 export namespace Util {
@@ -14,7 +14,10 @@ export namespace Util {
         body = await lambda(event, context);
         statusCode = StatusCode.Success;
       } catch (error: any) {
-        statusCode = error instanceof ValidationError ? error.statusCode : StatusCode.InternalServerError;
+        statusCode =
+          error instanceof ValidationError
+            ? error.statusCode
+            : StatusCode.InternalServerError;
         body = JSON.stringify({
           error: error instanceof Error ? error.message : String(error),
         });

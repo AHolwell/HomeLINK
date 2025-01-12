@@ -1,7 +1,7 @@
 import { APIGatewayProxyEvent } from "aws-lambda";
 import { deviceFactories, modelTypeToDeviceType } from "./device-factory";
 import { categoryUpdatableFields, Device, updateableBaseFields } from "./types";
-import { nonUpdatableFieldsError, ValidationError } from "../errors/errors";
+import { nonUpdatableFieldsError, ValidationError } from "../errors";
 import { validateRegisterBody } from "../input-vaidation";
 
 export type EventBody = {

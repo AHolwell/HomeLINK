@@ -21,10 +21,10 @@ export default $config({
     const auth = await import("./infra/auth");
 
     return {
-      UserPool: auth.userPool.id,
+      UserPoolId: auth.userPool.id,
       Region: aws.getRegionOutput().name,
       IdentityPool: auth.identityPool.id,
-      UserPoolClient: auth.userPoolClient.id,
+      UserPoolClientId: auth.userPoolClient.id,
       DeviceTable: storage.table.name,
     };
   },

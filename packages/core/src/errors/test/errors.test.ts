@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { missingFieldError, nonUpdatableFieldsError } from "../errors";
+import { missingFieldError, nonUpdatableFieldsError } from "..";
 
 describe("missingFieldError", () => {
   it.each([

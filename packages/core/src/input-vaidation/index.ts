@@ -1,5 +1,5 @@
 import { APIGatewayProxyEvent } from "aws-lambda";
-import { Errors, missingFieldError, ValidationError } from "../errors/errors";
+import { Errors, missingFieldError, ValidationError } from "../errors";
 import { validate as isValidUUID } from "uuid";
 
 export type EventBody = {

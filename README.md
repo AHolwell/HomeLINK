@@ -69,6 +69,7 @@ domain: $app.stage === "production" ? "api.homelink.<YOUR_DOMAIN>" : undefined,
       --client-id <USER_POOL_CLIENT_ID> \
       --username user@example.com \
       --password Passw0rd!
+      --profile <YOUR_PROFILE_NAME>
 ```
 
 7. And confirm their password
@@ -78,6 +79,7 @@ domain: $app.stage === "production" ? "api.homelink.<YOUR_DOMAIN>" : undefined,
       --region <COGNITO_REGION> \
       --user-pool-id <USER_POOL_ID> \
       --username user@example.com
+      --profile <YOUR_PROFILE_NAME>
 ```
 
 8. To test the endpoints, it is easiest to use [AWS API Gateway Test CLI](https://github.com/AnomalyInnovations/aws-api-gateway-cli-test) to navigate IAM Authorisation
