@@ -1,7 +1,5 @@
 import { table } from "./storage";
 
-//TODO rate limit API
-
 // Create the API
 export const api = new sst.aws.ApiGatewayV2("Api", {
   cors: true, //enabled by default anyway

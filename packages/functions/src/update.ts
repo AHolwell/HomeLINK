@@ -1,9 +1,20 @@
 import { Resource } from "sst";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { UpdateCommand, DynamoDBDocumentClient, GetCommand, GetCommandInput, UpdateCommandInput } from "@aws-sdk/lib-dynamodb";
+import {
+  UpdateCommand,
+  DynamoDBDocumentClient,
+  GetCommand,
+  GetCommandInput,
+  UpdateCommandInput,
+} from "@aws-sdk/lib-dynamodb";
 import { Util } from "@homelink/core/util";
 import { APIGatewayProxyEvent } from "aws-lambda";
-import { constructUpdateExpressions, getUpdatableFields } from "@homelink/core/devices";
+import {
+  constructUpdateExpressions,
+  getUpdatableFields,
+} from "@homelink/core/devices";
+import { validateId } from "@homelink/core/input-vaidation";
+import { Errors, ValidationError } from "@homelink/core/errors/errors";
 
 const dynamoDb = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 
@@ -16,48 +27,49 @@ const dynamoDb = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 // contstruct the update request
 
 export const main = Util.handler(async (event: APIGatewayProxyEvent) => {
-    if (!event.body) {
-        throw new Error('No body was passed')
-    }
+  if (!event.body) {
+    // Full validation is done later when constructing the expression, its worth checking for empty body first though to avoid unnecessary table requests
+    throw new ValidationError(Errors.NoBody);
+  }
+  const id: string = validateId(event?.pathParameters?.id);
 
+  // Get the current entry.
+  const getParams: GetCommandInput = {
+    TableName: Resource.Devices.name,
 
-    // Get the current entry.
-    const getParams: GetCommandInput = {
-        TableName: Resource.Devices.name,
+    Key: {
+      userId: event.requestContext.authorizer?.iam.cognitoIdentity.identityId,
+      deviceId: id, // Specified in body of request
+    },
+  };
 
-        Key: {
-            userId: event.requestContext.authorizer?.iam.cognitoIdentity.identityId,
-            deviceId: event?.pathParameters?.id, // Specified in body of request
-        },
-    };
+  const getResult = await dynamoDb.send(new GetCommand(getParams));
+  if (!getResult.Item) {
+    throw new Error("Item not found.");
+  }
 
-    const getResult = await dynamoDb.send(new GetCommand(getParams));
-    if (!getResult.Item) {
-        throw new Error("Item not found.");
-    }
-    
-    if (!getResult.Item?.deviceCategory) {
-        throw new Error("Device category not found")
-    }
-    
-    const allowedFields = getUpdatableFields(getResult.Item?.deviceCategory)
+  if (!getResult.Item?.deviceCategory) {
+    throw new Error("Device category not found");
+  }
 
-    const {updateExpression, expressionAttributeValues} = constructUpdateExpressions(allowedFields, event.body)
-    
-    const updateParams: UpdateCommandInput = {
-        TableName: Resource.Devices.name,
-        Key: {
-            // The attributes of the item to be created
-            userId: event.requestContext.authorizer?.iam.cognitoIdentity.identityId,
-            deviceId: event?.pathParameters?.id,
-        },
-        // 'UpdateExpression' defines the attributes to be updated
-        // 'ExpressionAttributeValues' defines the value in the update expression
-        UpdateExpression: updateExpression,
-        ExpressionAttributeValues: expressionAttributeValues
-    };
+  const allowedFields = getUpdatableFields(getResult.Item?.deviceCategory);
 
-    await dynamoDb.send(new UpdateCommand(updateParams));
+  const { updateExpression, expressionAttributeValues } =
+    constructUpdateExpressions(allowedFields, event.body);
 
-    return JSON.stringify({ status: true });
+  console.log(updateExpression, expressionAttributeValues);
+
+  const updateParams: UpdateCommandInput = {
+    TableName: Resource.Devices.name,
+    Key: {
+      userId: event.requestContext.authorizer?.iam.cognitoIdentity.identityId,
+      deviceId: id,
+    },
+    UpdateExpression: updateExpression,
+    ExpressionAttributeValues: expressionAttributeValues,
+  };
+
+  await dynamoDb.send(new UpdateCommand(updateParams));
+
+  return JSON.stringify({ status: true });
 });

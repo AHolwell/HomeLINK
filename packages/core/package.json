@@ -12,6 +12,8 @@
     ]
   },
   "dependencies": {
+    "aws-sdk-client-mock": "^4.1.0",
+    "aws-sdk-client-mock-vitest": "^5.1.0",
     "sst": "*"
   },
   "devDependencies": {

@@ -10,16 +10,15 @@ export default $config({
       providers: {
         aws: {
           region: "eu-west-2",
-          profile: "adminProfile"
-        }
-      }
+          profile: "adminProfile",
+        },
+      },
     };
   },
   async run() {
     const storage = await import("./infra/storage");
     await import("./infra/api");
     const auth = await import("./infra/auth");
-
 
     return {
       UserPool: auth.userPool.id,
