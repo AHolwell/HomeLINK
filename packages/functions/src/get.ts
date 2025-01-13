@@ -8,8 +8,13 @@ import {
   GetCommandOutput,
 } from "@aws-sdk/lib-dynamodb";
 import { APIGatewayProxyEvent } from "aws-lambda";
-import { validateId } from "@homelink/core/input-validation";
-import { Errors, ValidationError } from "@homelink/core/errors";
+import {
+  StatusCode,
+  ValidationError,
+  ValidationErrors,
+} from "@homelink/core/errors";
+import { GenericRequest } from "@homelink/core/parsing/schema/requestBodies";
+import { parseGenericRequest } from "@homelink/core/parsing";
 
 const dynamoDb = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 
@@ -22,20 +27,23 @@ const dynamoDb = DynamoDBDocumentClient.from(new DynamoDBClient({}));
  * @returns the full item object
  */
 export const main = Util.handler(async (event: APIGatewayProxyEvent) => {
-  const id: string = validateId(event?.pathParameters?.id);
+  const genericRequest: GenericRequest = parseGenericRequest(event);
 
   const params: GetCommandInput = {
     TableName: Resource.Devices.name,
     Key: {
-      userId: event.requestContext.authorizer?.iam.cognitoIdentity.identityId,
-      deviceId: id,
+      userId: genericRequest.userId,
+      deviceId: genericRequest.deviceId,
     },
   };
 
   const result: GetCommandOutput = await dynamoDb.send(new GetCommand(params));
 
   if (!result.Item) {
-    throw new ValidationError(Errors.ItemNotFound);
+    throw new ValidationError(
+      ValidationErrors.ItemNotFound,
+      StatusCode.NotFound,
+    );
   }
 
   return JSON.stringify(result.Item);

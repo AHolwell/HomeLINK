@@ -10,11 +10,10 @@ import {
 import { Util } from "@homelink/core/util";
 import { APIGatewayProxyEvent } from "aws-lambda";
 import {
-  constructUpdateExpressions,
-  getUpdatableFields,
-} from "@homelink/core/devices";
-import { validateId } from "@homelink/core/input-validation";
-import { Errors, ValidationError } from "@homelink/core/errors";
+  InternalError,
+  StatusCode,
+  ValidationError,
+} from "@homelink/core/errors";
 
 const dynamoDb = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 
@@ -46,16 +45,20 @@ export const main = Util.handler(async (event: APIGatewayProxyEvent) => {
 
   const getResult = await dynamoDb.send(new GetCommand(getParams));
   if (!getResult.Item) {
-    throw new Error("Item not found.");
+    throw new ValidationError(Errors.ItemNotFound, StatusCode.NotFound);
   }
 
   if (!getResult.Item?.deviceCategory) {
-    throw new Error("Device category not found");
+    throw new InternalError(Errors.DeviceCategoryNotFound);
   }
 
   // Update the item with new values
   const allowedFields = getUpdatableFields(getResult.Item?.deviceCategory);
 
+  // TODO: Also split the validation and construction steps if possible
+  // Allow input validation to use functionality from devices, but not the other way around
+  // Store schema in devices, input validation can then pull those schema to check the user body is allowed
+  // Constructing the update expressions can be a util.
   const { updateExpression, expressionAttributeValues } =
     constructUpdateExpressions(allowedFields, event.body);
 

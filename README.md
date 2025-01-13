@@ -1,5 +1,7 @@
 # HomeLink Interview Task
 
+//TODO last - make index files just the exports.https://basarat.gitbook.io/typescript/main-1/barrel
+
 ### Warning!
 
 This project uses the [SST framework](https://sst.dev/).
@@ -114,6 +116,8 @@ Note: The tests are ran via SST scripts, which means you'll need to have configu
 - To simulate real world, device categories with the same functions -ie lights - could be registered with different models rather than just as 'lights'
 - All devices will have a model type, and then an over arching category such as 'Light' which has shared functionality across those models.
 - User has AWS CLI and account set up for usage.
+- The API will be made available to consumers to interact with directly - custom home set ups for IoT hobbyists + enthusiasts.
+  - helpful error messages but no data leaking - a challenge
 
 ### Tech
 
@@ -122,23 +126,33 @@ DynamoDB table to store the device information.
 - Non-relational allows for devices to have different headers but be stored in the same place
 - Key-Value pair is a natural fit for the data - users with different device IDs
 
-Serverless architecture is ideal for the usecase of small snippets of code supporting the API, and the infrequent use they'll have.
+Serverless architecture is ideal for the use case of small snippets of code supporting the API, and the infrequent use they'll have.
 
 Cognito to provide handy login functionality to store devices against users, as well as protect me from going broke.
 
-SST to handle IaC + dpeloyment cleanly + quickly for a small project, as well as hopefully eliminate the chance of being hit with a 'it works on my machine' scenario.
+SST to handle IaC + deployment cleanly + quickly for a small project, as well as hopefully eliminate the chance of being hit with a 'it works on my machine' scenario.
 
-Vitest because itw as packed with SST
+Vitest because its packaged with SST
 
 Typescript because typing is cool.
 
 ### Design
 
-Its a fairly standard serverless design. API gateway routing to lambdas to handle the functionality. The lambdas validate the request, interact with the DynamoDB and confirm the results. Cognito is used to provide authentification functionality so other people cant see my devices (or spam my endpoints).
+It's a fairly standard serverless design. API gateway routing to lambdas to handle the functionality. The lambdas validate the request, interact with the DynamoDB and confirm the results. Cognito is used to provide authentification functionality so other people cant see my devices (or spam my endpoints).
 
 The lambda code itself focuses on the interaction with the databases, any further functionality/logic has been abstracted into the devices core package. There is also a Lambda Handler wrapper in Utils to cleanly manage error handling, headers and CORs.
 
-The code has been structured in such a way that it should be easy to scale up the devices covered. Though as touched on in `./packages/core/src/devices/helpers.ts` and `./packages/core/src/devices/device-factory.ts`, the devices being hardcoded isnt ideal, a more realistic solution would be an external database of supported devices and their information to lookup.
+The code has been structured in such a way that it should be easy to scale up the devices covered. Though as touched on in `./packages/core/src/devices/helpers.ts` and `./packages/core/src/devices/device-factory.ts`, the devices being hardcoded isnt ideal, a more realistic solution would be an external database of supported devices and their information to lookup. Schema changes are scary and we want them to be away from the application.
+
+Devices is designed as if it was an external package that this app relys on, so schemas arent so readily available and changable by someone who isnt sure what they are doing - maintain a trustable source of truth //TODO
+
+Would be good to: Fill test gaps - lambda unhappy paths and functional testing (mock databases)
+
+Somewhat strange that we're recieving the unique device id into the register endpoint rather than generating one on register - who is the user and why would they have this?
+
+Register needs to infer properties about the device the user hasnt given, we dont want them to have to specifically register the starting colour etc - too much friction.
+
+I'll allow any device category, though support certain ones with extra functionality - "Light" and "CarbonMonitor"
 
 ### Most interesting challenge
 
@@ -149,6 +163,16 @@ Having the update endpoint allow any valid combination of fields to be updated.
 Also thought a fair bit on what the best identifiers for devices where - categories, model types, etc
 
 As always debugging lambda functions
+
+I would want most of the device logic to be a seperate package
+
+Cant test invalid jsons through gateway tool
+
+### Expansion
+
+Lambda triggers on dynamodb changes to talk to the devices and update them with whats been put in the table.
+
+Or cron jobs periodically checking for table updates and pushing them out if not time critical.
 
 ## The Task Description
 

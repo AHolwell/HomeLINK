@@ -2,8 +2,8 @@
 
 ```
 npx aws-api-gateway-cli-test \
-  --username='d612c2b4-9031-7099-527f-cc90a787a592' \
-  --password='Passw0rd!' \
+  --username='76c20204-c031-7093-4bb3-d0db792a361b' \
+  --password='MyNewPassw0rd!' \
   --user-pool-id='eu-west-2_wwABMsyxN' \
   --app-client-id='4tjmm1mspujnkgrkcko8nnntiq' \
   --cognito-region='eu-west-2' \
@@ -12,15 +12,15 @@ npx aws-api-gateway-cli-test \
   --api-gateway-region='eu-west-2' \
   --path-template='/devices' \
   --method='POST' \
-  --body='{"modelType": "CO", "deviceName": "MyCOMon"}'
+  --body='{"deviceCategory": "CarbonMonitor", "deviceName": "MyCOMon", "deviceId": "123"}'
 ```
 
 #### List all
 
 ```
 npx aws-api-gateway-cli-test \
-  --username='d612c2b4-9031-7099-527f-cc90a787a592' \
-  --password='Passw0rd!' \
+  --username='76c20204-c031-7093-4bb3-d0db792a361b' \
+  --password='MyNewPassw0rd!' \
   --user-pool-id='eu-west-2_wwABMsyxN' \
   --app-client-id='4tjmm1mspujnkgrkcko8nnntiq' \
   --cognito-region='eu-west-2' \
@@ -35,8 +35,8 @@ npx aws-api-gateway-cli-test \
 
 ```
 npx aws-api-gateway-cli-test \
-  --username='d612c2b4-9031-7099-527f-cc90a787a592' \
-  --password='Passw0rd!' \
+  --username='c67292f4-80d1-7005-14d7-63dd1b4056ab' \
+  --password='MyNewPassw0rd!' \
   --user-pool-id='eu-west-2_wwABMsyxN' \
   --app-client-id='4tjmm1mspujnkgrkcko8nnntiq' \
   --cognito-region='eu-west-2' \
@@ -52,8 +52,8 @@ npx aws-api-gateway-cli-test \
 
 ```
 npx aws-api-gateway-cli-test \
-  --username='d612c2b4-9031-7099-527f-cc90a787a592' \
-  --password='Passw0rd!' \
+  --username='c67292f4-80d1-7005-14d7-63dd1b4056ab' \
+  --password='MyNewPassw0rd!' \
   --user-pool-id='eu-west-2_wwABMsyxN' \
   --app-client-id='4tjmm1mspujnkgrkcko8nnntiq' \
   --cognito-region='eu-west-2' \
@@ -70,8 +70,8 @@ npx aws-api-gateway-cli-test \
 
 ```
 npx aws-api-gateway-cli-test \
-  --username='c6c2a2a4-10f1-70e4-a5c5-2fda9f12de29' \
-  --password='U1Passw0rd!' \
+  --username='c67292f4-80d1-7005-14d7-63dd1b4056ab' \
+  --password='MyNewPassw0rd!' \
   --user-pool-id='eu-west-2_wwABMsyxN' \
   --app-client-id='4tjmm1mspujnkgrkcko8nnntiq' \
   --cognito-region='eu-west-2' \
@@ -89,15 +89,16 @@ npx aws-api-gateway-cli-test \
 aws cognito-idp sign-up \
   --region eu-west-2 \
   --client-id 4tjmm1mspujnkgrkcko8nnntiq \
-  --username admin@example.com \
-  --password Passw0rd!
+  --username user1@example.com \
+  --password MyNewPassw0rd!
 ```
 
 ```
 aws cognito-idp admin-confirm-sign-up \
   --region eu-west-2 \
   --user-pool-id eu-west-2_wwABMsyxN \
-  --username admin@example.com
+  --username user1@example.com \
+  --profile adminProfile
 ```
 
 #### Params
@@ -106,3 +107,8 @@ IdentityPool: eu-west-2:2cc84db5-a550-4e47-a4fe-d26c7d01cd75
 Region: eu-west-2
 UserPoolClientId: 4tjmm1mspujnkgrkcko8nnntiq
 UserPoolId: eu-west-2_wwABMsyxN
+
+#### Users
+
+76c20204-c031-7093-4bb3-d0db792a361b
+c67292f4-80d1-7005-14d7-63dd1b4056ab
