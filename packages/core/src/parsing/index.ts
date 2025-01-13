@@ -1,3 +1,4 @@
+import { event } from "sst/event";
 import {
   formatZodError,
   InternalError,
@@ -14,11 +15,8 @@ import {
   registerRequestSchema,
 } from "./schema/requestBodies";
 import { APIGatewayProxyEvent } from "aws-lambda";
-
-// If I had to parse more than two bodies I would create a generic to do it that is passed the schema
-// However as there are only two of these needed I think its a lot more readable to be explicit here
-
-// TODO More spceific internal errors
+import { Device, DeviceUpdate } from "../devices/schema/Device";
+import { baseDeviceUpdateSchema, deviceUpdateSchemas } from "../devices/schema";
 
 export const parseGenericRequest = (
   event: APIGatewayProxyEvent,
@@ -69,4 +67,30 @@ export const parseRegisterRequest = (
   };
 
   return registerRequest;
+};
+
+export const parseUpdateRequest = (
+  event: APIGatewayProxyEvent,
+  deviceCategory: string,
+): DeviceUpdate => {
+  if (!event?.body) throw new ValidationError(ValidationErrors.NoBody);
+  let jsonObject: Object;
+
+  try {
+    jsonObject = JSON.parse(event.body);
+  } catch (error: any) {
+    throw new ValidationError(ValidationErrors.InvalidJson);
+  }
+
+  const updateSchema =
+    deviceUpdateSchemas[deviceCategory.toLocaleLowerCase()] ||
+    baseDeviceUpdateSchema;
+
+  const parseResult = updateSchema.safeParse(jsonObject);
+
+  if (!parseResult.success)
+    throw new ValidationError(formatZodError(parseResult.error));
+
+  const deviceUpdate: DeviceUpdate = parseResult.data;
+  return deviceUpdate;
 };

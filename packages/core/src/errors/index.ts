@@ -67,6 +67,7 @@ export enum InternalErrors {
   DeviceIncorrectlyConstructed = "The device does not satisfy the base device schema",
   ParsingError = "Request parsing failed",
   DynamoCommandFailed = "The dynamo command failed without an error message",
+  DeviceCategoryNotFound = "Device does not have a category stored",
 }
 /**
  * StatusCode enum for DRY (dont repeat yourself) purposes
@@ -80,27 +81,67 @@ export enum StatusCode {
 }
 
 /**
- *
- * @param error
- * @returns
+ * Formats a ZodError into a readable string message.
+ * @param {ZodError} error - The ZodError object.
+ * @returns {string} - Formatted error message.
  */
-export const formatZodError = (error: ZodError): string => {
+export const formatZodError = (error: ZodError) => {
   const missingFields: string[] = [];
   const invalidFields: string[] = [];
+  const tooBigFields: string[] = [];
+  const tooSmallFields: string[] = [];
+  const customErrors: string[] = [];
+  const invalidEnumFields: string[] = [];
 
   // Iterate through each issue in the Zod error
   error.errors.forEach((issue) => {
     const fieldPath = issue.path.join(".");
-    if (issue.code === "invalid_type") {
-      if (issue.received === "undefined") {
-        // Missing field case
-        missingFields.push(fieldPath);
-      } else {
-        // Invalid type case
-        invalidFields.push(
-          `${fieldPath} (expected ${issue.expected}, received ${issue.received})`,
+
+    switch (issue.code) {
+      case "invalid_type":
+        if (issue.received === "undefined") {
+          // Missing field case
+          missingFields.push(fieldPath);
+        } else {
+          // Invalid type case
+          invalidFields.push(
+            `${fieldPath} (expected ${issue.expected}, received ${issue.received})`,
+          );
+        }
+        break;
+
+      case "too_big":
+        tooBigFields.push(
+          `${fieldPath} (maximum ${issue.maximum} ${issue.type}${
+            issue.inclusive ? " inclusive" : ""
+          })`,
         );
-      }
+        break;
+
+      case "too_small":
+        tooSmallFields.push(
+          `${fieldPath} (minimum ${issue.minimum} ${issue.type}${
+            issue.inclusive ? " inclusive" : ""
+          })`,
+        );
+        break;
+
+      case "invalid_enum_value":
+        invalidEnumFields.push(
+          `${fieldPath} (received "${issue.received}", expected one of: ${issue.options.join(
+            ", ",
+          )})`,
+        );
+        break;
+
+      case "custom":
+        customErrors.push(`${fieldPath} (custom error: ${issue.message})`);
+        break;
+
+      default:
+        // For any other error types, fallback to including the message
+        invalidFields.push(`${fieldPath} (error: ${issue.message})`);
+        break;
     }
   });
 
@@ -111,8 +152,35 @@ export const formatZodError = (error: ZodError): string => {
       : null;
   const invalidMessage =
     invalidFields.length > 0
-      ? `Invalid type on the following field(s): ${invalidFields.join(", ")}`
+      ? `Invalid type or other error on the following field(s): ${invalidFields.join(
+          ", ",
+        )}`
+      : null;
+  const tooBigMessage =
+    tooBigFields.length > 0
+      ? `Field(s) exceeding maximum size: ${tooBigFields.join(", ")}`
+      : null;
+  const tooSmallMessage =
+    tooSmallFields.length > 0
+      ? `Field(s) below minimum size: ${tooSmallFields.join(", ")}`
+      : null;
+  const enumMessage =
+    invalidEnumFields.length > 0
+      ? `Invalid value for enum field(s): ${invalidEnumFields.join(", ")}`
+      : null;
+  const customMessage =
+    customErrors.length > 0
+      ? `Custom error(s): ${customErrors.join(", ")}`
       : null;
 
-  return [missingMessage, invalidMessage].filter(Boolean).join(". ");
+  return [
+    missingMessage,
+    invalidMessage,
+    tooBigMessage,
+    tooSmallMessage,
+    enumMessage,
+    customMessage,
+  ]
+    .filter(Boolean)
+    .join(". ");
 };

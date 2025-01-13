@@ -11,9 +11,17 @@ import { Util } from "@homelink/core/util";
 import { APIGatewayProxyEvent } from "aws-lambda";
 import {
   InternalError,
+  InternalErrors,
   StatusCode,
   ValidationError,
+  ValidationErrors,
 } from "@homelink/core/errors";
+import {
+  parseGenericRequest,
+  parseUpdateRequest,
+} from "@homelink/core/parsing";
+import { GenericRequest } from "@homelink/core/parsing/schema/requestBodies";
+import { DeviceUpdate } from "@homelink/core/devices/schema/Device";
 
 const dynamoDb = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 
@@ -27,46 +35,45 @@ const dynamoDb = DynamoDBDocumentClient.from(new DynamoDBClient({}));
  * @returns true when the item has been updated
  */
 export const main = Util.handler(async (event: APIGatewayProxyEvent) => {
-  if (!event.body) {
-    // Full validation is done later when constructing the expression, its worth checking for empty body first though to avoid unnecessary table requests
-    throw new ValidationError(Errors.NoBody);
-  }
-  const id: string = validateId(event?.pathParameters?.id);
+  const genericRequest: GenericRequest = parseGenericRequest(event);
 
   // Get the current entry.
   const getParams: GetCommandInput = {
     TableName: Resource.Devices.name,
 
     Key: {
-      userId: event.requestContext.authorizer?.iam.cognitoIdentity.identityId,
-      deviceId: id,
+      userId: genericRequest.userId,
+      deviceId: genericRequest.deviceId,
     },
   };
 
   const getResult = await dynamoDb.send(new GetCommand(getParams));
+
   if (!getResult.Item) {
-    throw new ValidationError(Errors.ItemNotFound, StatusCode.NotFound);
+    throw new ValidationError(
+      ValidationErrors.ItemNotFound,
+      StatusCode.NotFound,
+    );
   }
 
   if (!getResult.Item?.deviceCategory) {
-    throw new InternalError(Errors.DeviceCategoryNotFound);
+    throw new InternalError(InternalErrors.DeviceCategoryNotFound);
   }
 
-  // Update the item with new values
-  const allowedFields = getUpdatableFields(getResult.Item?.deviceCategory);
+  const deviceUpdate: DeviceUpdate = parseUpdateRequest(
+    event,
+    getResult.Item.deviceCategory,
+  );
 
-  // TODO: Also split the validation and construction steps if possible
-  // Allow input validation to use functionality from devices, but not the other way around
-  // Store schema in devices, input validation can then pull those schema to check the user body is allowed
-  // Constructing the update expressions can be a util.
+  // Update the item with new values
   const { updateExpression, expressionAttributeValues } =
-    constructUpdateExpressions(allowedFields, event.body);
+    Util.constructUpdateExpressions(deviceUpdate);
 
   const updateParams: UpdateCommandInput = {
     TableName: Resource.Devices.name,
     Key: {
-      userId: event.requestContext.authorizer?.iam.cognitoIdentity.identityId,
-      deviceId: id,
+      userId: genericRequest.userId,
+      deviceId: genericRequest.deviceId,
     },
     UpdateExpression: updateExpression,
     ExpressionAttributeValues: expressionAttributeValues,

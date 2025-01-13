@@ -174,6 +174,10 @@ Lambda triggers on dynamodb changes to talk to the devices and update them with 
 
 Or cron jobs periodically checking for table updates and pushing them out if not time critical.
 
+### Known Issues
+
+- The Zod safeParse seems to crash out when the string max length is not adhered to. Wrapping in a try catch does not fix the issue. Strangely it works fine for everything else. Its inelegantly handled as an internal server error.
+
 ## The Task Description
 
 ### Overview

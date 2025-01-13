@@ -52,7 +52,7 @@ npx aws-api-gateway-cli-test \
 
 ```
 npx aws-api-gateway-cli-test \
-  --username='c67292f4-80d1-7005-14d7-63dd1b4056ab' \
+  --username='76c20204-c031-7093-4bb3-d0db792a361b' \
   --password='MyNewPassw0rd!' \
   --user-pool-id='eu-west-2_wwABMsyxN' \
   --app-client-id='4tjmm1mspujnkgrkcko8nnntiq' \
@@ -62,7 +62,7 @@ npx aws-api-gateway-cli-test \
   --api-gateway-region='eu-west-2' \
   --path-template='/devices/{id}' \
   --method='PUT' \
-  --params='{"id": "d969e820-d0fb-11ef-bd87-cf2f6d616065"}' \
+  --params='{"id": "1"}' \
   --body='{"colour": "Red"}'
 ```
 

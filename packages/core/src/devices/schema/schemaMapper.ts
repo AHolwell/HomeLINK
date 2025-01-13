@@ -1,9 +1,17 @@
 import { z } from "zod";
 import { baseDeviceSchema } from "./BaseDevice";
-import { carbonMonitorSchema } from "./CarbonMonitor";
-import { lightSchema } from "./Light";
+import {
+  carbonMonitorSchema,
+  carbonMonitorUpdateSchema,
+} from "./CarbonMonitor";
+import { lightSchema, lightUpdateSchema } from "./Light";
 
-export const deviceCategorySchemas: Record<string, z.ZodObject<any>> = {
+export const deviceSchemas: Record<string, z.ZodObject<any>> = {
   light: lightSchema,
   carbonmonitor: carbonMonitorSchema,
+};
+
+export const deviceUpdateSchemas: Record<string, z.ZodObject<any>> = {
+  light: lightUpdateSchema,
+  carbonmonitor: carbonMonitorUpdateSchema,
 };

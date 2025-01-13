@@ -6,6 +6,7 @@ import {
   ValidationError,
 } from "../errors";
 import { isAwaitKeyword } from "typescript";
+import { DeviceUpdate } from "../devices/schema/Device";
 
 export namespace Util {
   /**
@@ -66,15 +67,15 @@ export namespace Util {
    *
    * WARNING: Assumes that the update object is safe
    */
-  export function constructUpdateExpressions(updateObject: object) {
-    let updateExpression: string = "SET ";
-
-    Object.keys(updateExpression).forEach((key) => {
-      updateExpression += `${key} = :${key} `;
-    });
+  export function constructUpdateExpressions(deviceUpdate: DeviceUpdate) {
+    let updateExpression =
+      "SET " +
+      Object.keys(deviceUpdate)
+        .map((key) => `${key} = :${key}`)
+        .join(", ");
 
     const expressionAttributeValues = Object.fromEntries(
-      Object.entries(updateObject).map(([key, value]) => [`:${key}`, value]),
+      Object.entries(deviceUpdate).map(([key, value]) => [`:${key}`, value]),
     );
 
     return { updateExpression, expressionAttributeValues };

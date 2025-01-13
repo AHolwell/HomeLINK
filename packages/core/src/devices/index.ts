@@ -1,7 +1,7 @@
 // Supporting functionality for the lambdas regarding device management
 import { InternalError, InternalErrors } from "../errors";
 import { RegisterRequest } from "../parsing/schema/requestBodies";
-import { baseDeviceSchema, deviceCategorySchemas } from "./schema";
+import { baseDeviceSchema, deviceSchemas } from "./schema";
 import { Device } from "./schema/Device";
 
 /**
@@ -20,7 +20,7 @@ export const isDevice = (obj: any): obj is Device => {
  */
 export const createDevice = (registerRequest: RegisterRequest): Device => {
   const schema =
-    deviceCategorySchemas[registerRequest.deviceCategory.toLocaleLowerCase()] ||
+    deviceSchemas[registerRequest.deviceCategory.toLocaleLowerCase()] ||
     baseDeviceSchema;
 
   const device = schema.parse(registerRequest);
