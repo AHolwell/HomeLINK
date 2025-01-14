@@ -14,7 +14,7 @@ npx aws-api-gateway-cli-test \
   --app-client-id='<USERPOOL_CLIENT_ID>' \
   --cognito-region='<REGION>' \
   --identity-pool-id='<IDENTITY_POOL>' \
-  --invoke-url='https://dev.api.homelink.nuvolaconsulting.co.uk' \
+  --invoke-url='https://api.homelink.nuvolaconsulting.co.uk' \
   --api-gateway-region='<REGION>' \
   --path-template='/devices' \
   --method='POST' \
@@ -31,7 +31,7 @@ npx aws-api-gateway-cli-test \
   --app-client-id='<USERPOOL_CLIENT_ID>' \
   --cognito-region='<REGION>' \
   --identity-pool-id='<IDENTITY_POOL>' \
-  --invoke-url='https://dev.api.homelink.nuvolaconsulting.co.uk' \
+  --invoke-url='https://api.homelink.nuvolaconsulting.co.uk' \
   --api-gateway-region='<REGION>' \
   --path-template='/devices' \
   --method='GET'
@@ -47,7 +47,7 @@ npx aws-api-gateway-cli-test \
   --app-client-id='<USERPOOL_CLIENT_ID>' \
   --cognito-region='<REGION>' \
   --identity-pool-id='<IDENTITY_POOL>' \
-  --invoke-url='https://dev.api.homelink.nuvolaconsulting.co.uk' \
+  --invoke-url='https://api.homelink.nuvolaconsulting.co.uk' \
   --api-gateway-region='<REGION>' \
   --path-template='/devices/{id}' \
   --method='GET' \
@@ -64,7 +64,7 @@ npx aws-api-gateway-cli-test \
   --app-client-id='<USERPOOL_CLIENT_ID>' \
   --cognito-region='<REGION>' \
   --identity-pool-id='<IDENTITY_POOL>' \
-  --invoke-url='https://dev.api.homelink.nuvolaconsulting.co.uk' \
+  --invoke-url='https://api.homelink.nuvolaconsulting.co.uk' \
   --api-gateway-region='<REGION>' \
   --path-template='/devices/{id}' \
   --method='PUT' \
@@ -82,7 +82,7 @@ npx aws-api-gateway-cli-test \
   --app-client-id='<USERPOOL_CLIENT_ID>' \
   --cognito-region='<REGION>' \
   --identity-pool-id='<IDENTITY_POOL>' \
-  --invoke-url='https://dev.api.homelink.nuvolaconsulting.co.uk' \
+  --invoke-url='https://api.homelink.nuvolaconsulting.co.uk' \
   --api-gateway-region='<REGION>' \
   --path-template='/devices/{id}' \
   --method='DELETE' \

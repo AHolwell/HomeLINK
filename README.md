@@ -12,6 +12,8 @@ Following the `getting started` steps below will deploy resources to your AWS ac
 
 If you would rather not deploy the api I will have it hosted at `api.homelink.nuvolaconsulting.co.uk` and will provide you with the credentials for some users.
 
+Note I have manually disabled signups for the hosted version, please use the provided credentials.
+
 ## Get started
 
 The following steps assumes you have access to an AWS account with sufficient IAM permissions to provision. Further you will need the [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) installed on your machine.
