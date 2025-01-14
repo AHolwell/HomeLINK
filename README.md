@@ -119,7 +119,7 @@ Note: The tests are ran via SST, a quirk of which means you'll need to have conf
 - The API itself is the product (ie. no frontend) and will be made available to consumers to interact with directly - targeting custom home set ups for IoT hobbyists + enthusiasts who want to use the API to manage their device states.
 - Though real time, the data is updated infrequently - ie. we're not streaming real time updates every second, but keeping track of things that change a few times a day.
 - Different devices will have different functionality and information storage needs
-  - You'll want to know and update the colour Light but not of your Air Quality Sensor (maybe)
+  - You'll want to know and update the colour of your Light, but not of your Air Quality Sensor (probably)
 
 ### Tech Choices
 
