@@ -139,7 +139,7 @@ Given the project's small scale, all data is stored in a single DynamoDB table, 
 
 ##### Compute - API Gateway + Lambdas
 
-Each endpoint only needs to run a small bit of logic, validate the request and execute the change in the database. Such small snippets are perfect for lambdas. Further the asyncrhnous, idempotent, and scalable nature of lambdas is a good fit for the IoT environment.
+Each endpoint only needs to run a small bit of logic, validate the request and execute the change in the database. Such small snippets are perfect for lambdas. Further the asyncrhonous, idempotent, and scalable nature of lambdas is a good fit for the IoT environment.
 
 Further a RESTful API through API Gateway was a suitable approach for the asynchronous communication and operations.
 
@@ -207,13 +207,13 @@ Each lambda's code is generally structured into five parts.
 
 ##### Supporting Code
 
-`./packages/core` contains the rest of the code that the lambdas utilise, the dependencies such as Zod and vitest are installed into this package only.
+`./packages/core` contains the rest of the code that the lambdas utilise, the dependencies such as Zod and Vitest are installed into this package only.
 
 - `./core/src/devices` holds the functions to create the device object during registration, and to construct the device's DynamoDB update expression when their state changes. Notably this functionality is intentionally device agnostic.
 
 - `./core/src/errors` holds extensions of the Error class for some custom error handling, as well as some boilerplate code to reformat zod errors to present them to my users in a more readable fashion.
 
-- `./core/src/functions-tests` holds the unit tests for the lambdas, note that vitest is not installed in the `./packages/functions` package, this is SST best practice to keep it lightweight. Hence the tests are stored here.
+- `./core/src/functions-tests` holds the unit tests for the lambdas, note that Vitest is not installed in the `./packages/functions` package, this is SST best practice to keep it lightweight. Hence the tests are stored here.
 
 - `./core/src/parsing` holds the functionality that validates and sanitises the user inputs, and constructs my typed objects based off the schema. Again this package is device agnostic and pulls device schemas when it needs them.
 
