@@ -59,7 +59,7 @@ domain: $app.stage === "production" ? "api.homelink.<YOUR_DOMAIN>" : undefined,
    $ npx sst deploy --stage production //full deplyoment
 ```
 
-7. Set up a user (or multiple). The resource IDs needed should have been output to your console after dpeloyment
+6. Set up a user (or multiple). The resource IDs needed should have been output to your console after dpeloyment
 
 ```
    $ aws cognito-idp sign-up \
@@ -70,7 +70,7 @@ domain: $app.stage === "production" ? "api.homelink.<YOUR_DOMAIN>" : undefined,
       --profile <YOUR_PROFILE_NAME>
 ```
 
-8. Confirm their password
+7. Confirm their password
 
 ```
    $ aws cognito-idp admin-confirm-sign-up \
