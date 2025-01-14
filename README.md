@@ -168,6 +168,7 @@ It's a standard serverless design. An API gateway with 5 routes to 5 lambdas to 
 Cognito sits in front of the gateway to authorise requests, and the database is only accessable via the API endpoints.
 
 The requests are authorised via the Cognito User being assigned IAM permissions to access the API. Further the cognito user id is used as the database hash key.
+
 ![architecure diagram](architecture.png)
 
 ### Data Structures
