@@ -169,7 +169,7 @@ Cognito sits in front of the gateway to authorise requests, and the database is 
 
 The requests are authorised via the Cognito User being assigned IAM permissions to access the API. Further the cognito user id is used as the database hash key.
 
-![architecure diagram](architecture.png)
+![architecure diagram](architectureDiagram.png)
 
 ### Data Structures
 
