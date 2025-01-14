@@ -56,10 +56,10 @@ domain: $app.stage === "production" ? "api.homelink.<YOUR_DOMAIN>" : undefined,
 ```
 
 ```
-   $ npx sst deploy --stage production //full deplyoment
+   $ npx sst deploy --stage production //full deployment
 ```
 
-6. Set up a user (or multiple). The resource IDs needed should have been output to your console after dpeloyment
+6. Set up a user (or multiple). The resource IDs needed should have been output to your console after deployment
 
 ```
    $ aws cognito-idp sign-up \
@@ -108,7 +108,7 @@ $ cd packages/core
 $ npm test
 ```
 
-Note: The tests are ran via SST, a quirk of which means you'll need to have configured AWS as described above - though this wont provision anything.
+Note: The tests are ran via SST, a quirk of which means you'll need to have configured AWS as described above - though this won't provision anything.
 
 ## My Approach
 
@@ -129,7 +129,7 @@ Further it provides easy scaling and just all the the other benefits of cloud co
 
 ##### Storage - DynamoDB:
 
-I went with DynamoDB as my table storage. This is based off the assumption that this is oft changed data, but not streamed data, as well as the assumption we'll want to store different fields for different devices. It plays well with frequent access and the non-relational structure allows for as many fields unqiue to devices as we want without heavily impacting performance.
+I went with DynamoDB as my table storage. This is based off the assumption that this is oft changed data, but not streamed data, as well as the assumption we'll want to store different fields for different devices. It plays well with frequent access and the non-relational structure allows for as many fields unique to devices as we want without heavily impacting performance.
 
 Further key-value pair is a natural fit for the data - users with different device IDs. Playing into the first assumption, I didnt want to enforce unique device Ids between users, hence a range and hash key (user id and device key) was a natural fit.
 
@@ -169,7 +169,7 @@ The majority of my input validation and sanitisation is done via Zod. Its an ext
 
 It's a standard serverless design. API gateway with 5 routes to 5 lambdas to handle each bit of functionality (delete, get, list, register, update). The lambdas validate the request and interact with the DynamoDB, then confirm the results via HTTP response back through the gateway.
 
-Cognito is sits infront of the gateway to authorise requests, and the database is only accessable via the API endpoints.
+Cognito is sits in front of the gateway to authorise requests, and the database is only accessable via the API endpoints.
 
 The requests are authorised via the Cognito User being assigned IAM permissions to access the API. Further the cognito user id is used as the database hash key.
 
@@ -178,13 +178,13 @@ The requests are authorised via the Cognito User being assigned IAM permissions 
 As has been touched on, the userId from cognito is the database _hash key_, then the user can pass in device Ids via the register endpoint to use as the _range key_. The unique combination of the two is used for the tables primary indexing.
 As far as the user is concerned howver, as their userId isnt known or accessable to them, their device Ids are all that is needed for querying the table.
 
-In terms the rest of the data stored about a device. I have a base device Zod Schema (`./packages/core/src/schema/BaseDevice`) which stores information all devices in the table will have. In essence it is what I am considereing the base functionality and registration details of all IoT devices.
+In terms the rest of the data stored about a device. I have a base device Zod Schema (`./packages/core/src/schema/BaseDevice`) which stores information all devices in the table will have. In essence it is what I am considering the base functionality and registration details of all IoT devices.
 
 This is then extended into specific device categories. Such as the two I have supported `Light` and `Carbon Monitor`. These have extra information on top of the base device information specific to their functionality, such as `colour` and `intensity`.
 
 While I support specific device categories, I allow any string to be used as the device category to support the users in using the api for their custom devices - in accordance with my first assumption.
 
-Each schema also comes with which fields the API will allow the user to update after registration. These are the fields related to ongoing functionality such as `isPowered` or customastion such as `deviceName`.
+Each schema also comes with which fields the API will allow the user to update after registration. These are the fields related to ongoing functionality such as `isPowered` or customisation such as `deviceName`.
 
 For the lowest friction device registration, and codebase simplicity, you cant set any customisation options during the registration request, you can only provide the registration information. The customisation options currently default to hardcoded values. though if it was appropriate, the defaults can be trivially replaced by functions to derive the initiation vlaues
 
@@ -210,7 +210,7 @@ Each lambda's code is generally structured into five parts.
 
 `register.ts` device slightly deviates from the others as the command is constructed from the device schema.
 
-`update.ts` deviates slightly further as it accesses the table twice. The first being a retirval of the device category to construct the correct update command.
+`update.ts` deviates slightly further as it accesses the table twice. The first being a retrieval of the device category to construct the correct update command.
 
 ##### Supporting Code
 
@@ -218,7 +218,7 @@ Each lambda's code is generally structured into five parts.
 
 - `./core/src/devices` holds the functions to create the device object during registration, and to construct the device's DynamoDB update expression when their state changes. Notably this functionality is intentionally device agnostic.
 
-- `./core/src/errors` holds extentions of the Error class for some custom error handling, as well as some boilerplaye code to reformat zod errors to present them to my users in a more readable fashion.
+- `./core/src/errors` holds extensions of the Error class for some custom error handling, as well as some boilerplate code to reformat zod errors to present them to my users in a more readable fashion.
 
 - `./core/src/functions-tests` holds the unit tests for the lambdas, note that vitest is not installed in the `./packages/functions` package. Hence the tests are stored here.
 
@@ -244,17 +244,17 @@ Each lambda's code is generally structured into five parts.
 
 - For this to actually work as an IoT system API, there would need to be some way for the device to actually respond to the change to its state in the table. The way I imagined that would fit with my current design would be lambdas triggered by changing data sending the update to the connected device.
 
-  - As ever you would need to be very careful about not letting this lambdas cause a loop.
+  - As ever, you would need to be very careful about not letting this lambdas cause a loop.
 
 - Alternatively for less time critical devices periodically checking for table updates and pushing them. This would eliminate the loop issue but would likely be far less responsive
 
-- There are also some testing gaps in my unit tests to be filled, further functional tests with mock databases wuld be a great addition
+- There are also some testing gaps in my unit tests to be filled, further functional tests with mock databases would be a great addition
 
 ### Known Issues
 
-- The Zod safeParse seems to crash out when the string max length is not adhered to. Wrapping in a try catch does not fix the issue. Strangely it works fine for everything else. Its inelegantly handled as an internal server error.
+- The Zod safeParse seems to crash out when the string max length is not adhered to. Wrapping in a try catch does not fix the issue. Strangely it works fine for everything else. It is currently inelegantly handled as an internal server error.
 
-- Not necessarily an issue, but mispelt fields will just be dropped without notice
+- Not necessarily an issue, but misspelt fields will just be dropped without notice
 
 ## The Task Description
 
