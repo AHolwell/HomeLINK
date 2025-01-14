@@ -33,6 +33,8 @@ Refer to the schema at `./packages/core/src/parsing/schema/requestBodies.ts` for
 
 For allowed update fields refer to the schema in `./packages/core/src/schema`
 
+Also see the email attachment for prefab commands to use with the version of the api I have hosted.
+
 #### Register a device
 
 ```
