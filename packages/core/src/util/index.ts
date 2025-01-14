@@ -26,24 +26,18 @@ export namespace Util {
             break;
           // Only return internal errors outside of prod for security
           case "InternalError":
-            statusCode = error.statusCode;
-            body = JSON.stringify({
-              error:
-                event.requestContext.stage !== "production"
-                  ? error.message
-                  : InternalErrors.Generic,
-            });
+            //Log the error using chosen logging service.
+            //Then return generic to avoid potential information leak.
+            statusCode = StatusCode.InternalServerError;
+            body = JSON.stringify({ error: InternalErrors.Generic });
             break;
           // Unexpected error types handling
           default:
-            statusCode = error?.statusCode ?? StatusCode.InternalServerError;
-            body = JSON.stringify({
-              error:
-                error?.message ??
-                (event.requestContext.stage !== "production"
-                  ? String(error)
-                  : InternalErrors.Generic),
-            });
+            //Log the error using chosen logging service.
+            //Then return generic to avoid potential information leak.
+            statusCode = StatusCode.InternalServerError;
+            body = JSON.stringify({ error: InternalErrors.Generic });
+            break;
         }
       }
       return {

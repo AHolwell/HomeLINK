@@ -75,6 +75,9 @@ export const main = Util.handler(async (event: APIGatewayProxyEvent) => {
     getResult.Item.deviceCategory,
   );
 
+  if (Object.keys(deviceUpdate).length == 0)
+    throw new ValidationError(ValidationErrors.NoValidUpdateFields);
+
   //Construct command
   const { updateExpression, expressionAttributeValues } =
     constructDeviceUpdateExpressions(deviceUpdate);

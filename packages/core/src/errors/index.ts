@@ -37,6 +37,7 @@ export enum ValidationErrors {
   InvalidJson = "Invalid JSON in request body",
   ItemNotFound = "No device found with given ID",
   ItemAlreadyExists = "An item with the provided device id already exists",
+  NoValidUpdateFields = "Request included no valid update fields",
 }
 
 /**

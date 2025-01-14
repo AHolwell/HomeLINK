@@ -236,7 +236,7 @@ Each lambda's code is generally structured into five parts.
 
 - Designing the code to be agnostic of the device it was working with was an interesting architectual point. Especially as I wanted to support any category with the base device I needed to be carefuly to always be mapping to the correct schema and maintain my typing integrity.
 
-- As I chose to expose certain error messages to the user it was a good exercise in handling my errors carefully, to make sure my error messages were helpful, but had no risk of data leakage. This lead to the ValidationError and InternalError extensions
+- As I chose to expose certain error messages to the user it was a good exercise in handling my errors carefully, to make sure my error messages were helpful, but had no risk of data leakage. This lead to the ValidationError and InternalError extensions. I'll feedback any validation errors but log Internal errors and respond with a generic error message. (I havent actually implemented any logging)
 
 - How to handle conflicting/repeated requests was also an interesting point. Especially in relation to the above - eg. when trying to delete a non-existant device, should I tell the user it wasnt there, or just confirm that there _now_ isn't that device.
 
