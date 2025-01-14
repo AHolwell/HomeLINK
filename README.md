@@ -2,7 +2,7 @@
 
 ### Overview
 
-This repo covers my solution to the HomeLINK take home tech task - full task details at bottom of readme.
+This repo covers my solution to the HomeLINK take home tech task - full task details at bottom of the README.
 
 This project uses the [SST framework](https://sst.dev/) to deploy an AWS serverless API.
 
