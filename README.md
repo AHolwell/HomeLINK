@@ -10,11 +10,11 @@ This project uses the [SST framework](https://sst.dev/) to deploy an AWS serverl
 
 Following the `getting started` steps below will deploy resources to your AWS account
 
-If you would rather not deploy the api I will have it hosted at `api.homelink.nuvolaconsulting.co.uk` and will provide you with the credentials for some users.
+If you would rather not deploy the api I will have it hosted at `api.homelink.nuvolaconsulting.co.uk` for the week and will have provided you with the credentials for some users in my email.
 
 Note I have manually disabled signups for the hosted version, please use the provided credentials. Further, though not part of the IaC, the API will be rate limited.
 
-## Get started
+## Get Started
 
 The following steps assumes you have access to an AWS account with sufficient IAM permissions to provision. Further you will need the [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) installed on your machine.
 
@@ -82,7 +82,7 @@ domain: $app.stage === "production" ? "api.homelink.<YOUR_DOMAIN>" : undefined,
       --profile <YOUR_PROFILE_NAME>
 ```
 
-8. To test the endpoints, it is easiest to use [AWS API Gateway Test CLI](https://github.com/AnomalyInnovations/aws-api-gateway-cli-test) to navigate IAM Authorisation
+8. To test the endpoints, it is easiest to use [AWS API Gateway Test CLI](https://github.com/AnomalyInnovations/aws-api-gateway-cli-test) to navigate IAM Authorisation. This will have been installed with npm in step 2.
 
    Please find detailed commands in `./commands.md` and user credentials in the email.
 
@@ -99,7 +99,7 @@ The code is in `./packages/` is split into:
 - `/functions` contains the lambda handlers for each route defined in the API
 - `/core` contains supporting logic utilised by the handlers
 
-I reccomend starting with the lambda functions, and looking into the supporting code as it comes up.
+I recommend starting with the lambda functions, and looking into the supporting code as it comes up.
 
 ## Tests
 
@@ -116,7 +116,7 @@ Note: The tests are ran via SST, a quirk of which means you'll need to have conf
 
 ### Assumptions
 
-- The API itself is the product (ie. no frontend) and will be made available to consumers to interact with directly - targeting custom home set ups for IoT hobbyists + enthusiasts who want to use the API to manage their device states.
+- The API itself is the product (i.e., it has no frontend) and will be made available to consumers to interact with directly - targeting custom home set ups for IoT hobbyists + enthusiasts who want to use the API to manage their device states.
 - Though real time, the data is updated infrequently - ie. we're not streaming real time updates every second, but keeping track of things that change a few times a day.
 - Different devices will have different functionality and information storage needs
   - You'll want to know and update the colour of your Light, but not of your Air Quality Sensor (probably)
@@ -127,21 +127,19 @@ Note: The tests are ran via SST, a quirk of which means you'll need to have conf
 
 I largely chose AWS to fit within the context of this being a technical test and the company's stack is AWS based. However a cloud based solution fits the needs of an IoT system by providing a lot of uptime reliability in the underlying infrastructure, as IoT devices can be in near constant connection.
 
-Further it provides easy scaling and just all the the other benefits of cloud computing.
+Further, it provides easy scaling, high connectivity and asynchronous functionality, all of which greatly benefit an IoT system
 
 ##### Storage - DynamoDB:
 
-I went with DynamoDB as my table storage. This is based off the assumption that this is oft changed data, but not streamed data, as well as the assumption we'll want to store different fields for different devices. It plays well with frequent access and the non-relational structure allows for as many fields unique to devices as we want without heavily impacting performance.
+I went with DynamoDB as my table storage. This is based off the assumption that this is regularly changed data, but not streamed data, as well as the assumption we'll want to store different fields for different devices. It handles frequent access well and the non-relational structure allows for as many fields unique to devices as we want without heavily impacting performance.
 
-Further key-value pair is a natural fit for the data - users with different device IDs. Playing into the first assumption, I didnt want to enforce unique device Ids between users, hence a range and hash key (user id and device key) was a natural fit.
+Further key-value pair is a natural fit for the data - users with different device IDs, each potentially associated with different field types. Playing into the first assumption, I didn't want to enforce unique device Ids between users, hence a range and hash key (user id and device key) was a natural fit.
+
+Given the project's small scale, all data is stored in a single DynamoDB table, though if it were to massively scale there is an argument for different tables for different device categories.
 
 ##### Compute - API Gateway + Lambdas
 
-Each endpoint only needs to run a small bit of logic, validate the request and execute the change in the database. Such small snippets are perfect for lambdas.
-
-Further the asyncrhnous, idempotent, and scalable nature of lambdas is a good fit for the IoT environment.
-
-Not to imply lambdas are inherently idempotent, but they can be, and these ones are.
+Each endpoint only needs to run a small bit of logic, validate the request and execute the change in the database. Such small snippets are perfect for lambdas. Further the asyncrhnous, idempotent, and scalable nature of lambdas is a good fit for the IoT environment.
 
 Further a RESTful API through API Gateway was a suitable approach for the asynchronous communication and operations.
 
@@ -151,15 +149,11 @@ We want users to only be able to access their devices, even though they are all 
 
 #### SST Framework
 
-SST to handle IaC + deployment cleanly and quickly for a small serverless project.
-
-Local development mode is an amazing tool for debugging lambdas without too much friction.
-
-As well as hopefully eliminate the chance of being hit with an '_it works on my machine_' scenario by hosting it myself..
+I used the SST framwork and tooling to handle IaC + deployment cleanly and quickly for a small serverless project. Local development mode is an amazing tool for debugging lambdas without too much friction. As well as hopefully eliminate the chance of being hit with an '_it works on my machine_' scenario by hosting it myself..
 
 #### NodeJs + Typescript
 
-I like static types, and SST is built around typescript, it was the most natural fit.
+I like static types, and SST is built around typescript.
 
 #### Zod
 
@@ -169,26 +163,23 @@ The majority of my input validation and sanitisation is done via Zod. Its an ext
 
 ### Architecture
 
-It's a standard serverless design. API gateway with 5 routes to 5 lambdas to handle each bit of functionality (delete, get, list, register, update). The lambdas validate the request and interact with the DynamoDB, then confirm the results via HTTP response back through the gateway.
+It's a standard serverless design. An API gateway with 5 routes to 5 lambdas to handle each bit of functionality (delete, get, list, register, update). The lambdas validate the request and interact with the DynamoDB, then confirm the results via HTTP response back through the gateway.
 
-Cognito is sits in front of the gateway to authorise requests, and the database is only accessable via the API endpoints.
+Cognito sits in front of the gateway to authorise requests, and the database is only accessable via the API endpoints.
 
 The requests are authorised via the Cognito User being assigned IAM permissions to access the API. Further the cognito user id is used as the database hash key.
+![architecure diagram](architecture.png)
 
 ### Data Structures
 
 As has been touched on, the userId from cognito is the database _hash key_, then the user can pass in device Ids via the register endpoint to use as the _range key_. The unique combination of the two is used for the tables primary indexing.
-As far as the user is concerned howver, as their userId isnt known or accessable to them, their device Ids are all that is needed for querying the table.
+However, as far as the user is concerned, they dont need to interact with their userId, their device Ids are all that is needed for querying the table.
 
-In terms the rest of the data stored about a device. I have a base device Zod Schema (`./packages/core/src/schema/BaseDevice`) which stores information all devices in the table will have. In essence it is what I am considering the base functionality and registration details of all IoT devices.
+For the rest of the data stored about a device. I have a base device Zod Schema (`./packages/core/src/schema/BaseDevice`) which stores information all devices in the table will have. In essence it is what I am considering the base functionality and registration details of all IoT devices. This is then extended into specific device categories. Such as the two I have supported `Light` and `Carbon Monitor`. These have extra information on top of the base device specific to their functionality, such as `colour` and `intensity` for lights.
 
-This is then extended into specific device categories. Such as the two I have supported `Light` and `Carbon Monitor`. These have extra information on top of the base device information specific to their functionality, such as `colour` and `intensity`.
+While I support specific device categories, I allow any string to be used as the device category to support the users in using the api for their custom devices - in accordance with my first assumption. Each schema also comes with which fields the API will allow the user to update after registration. These are the fields related to ongoing functionality such as `isPowered` or customisation such as `deviceName`.
 
-While I support specific device categories, I allow any string to be used as the device category to support the users in using the api for their custom devices - in accordance with my first assumption.
-
-Each schema also comes with which fields the API will allow the user to update after registration. These are the fields related to ongoing functionality such as `isPowered` or customisation such as `deviceName`.
-
-For the lowest friction device registration, and codebase simplicity, you cant set any customisation options during the registration request, you can only provide the registration information. The customisation options currently default to hardcoded values. though if it was appropriate, the defaults can be trivially replaced by functions to derive the initiation vlaues
+For the lowest friction device registration, and codebase simplicity, you cant set any customisation options during the registration request, you can only provide the registration information. The customisation options currently default to hardcoded values. Though, if it was appropriate, the defaults can be trivially replaced by functions to derive the initiation values.
 
 ### Requests
 
@@ -200,19 +191,19 @@ Note that the device id is always pulled from the route, not the request body.
 
 ##### Lambdas
 
-`./packages/functions` contains only the code directly within the lambdas in keeping with the SST frameworks filesystem structure
+`./packages/functions` contains only the code directly within the lambdas in keeping with the SST frameworks filesystem structure.
 
 Each lambda's code is generally structured into five parts.
 
 1. It validates and sanitises the request through Zod schemas.
 2. Uses the validated data to construct the dynamoDB client command.
-3. Then executes said command
+3. Then executes said command.
 4. Checks the database response if appropriate.
-5. Returns stringified result
+5. Returns stringified result.
 
-`register.ts` device slightly deviates from the others as the command is constructed from the device schema.
+`register.ts` slightly deviates from the others as the command is constructed from the device schema.
 
-`update.ts` deviates slightly further as it accesses the table twice. The first being a retrieval of the device category to construct the correct update command.
+`update.ts` deviates slightly further as it accesses the table twice. The first access being a retrieval of the device category to construct the correct subsequent update command.
 
 ##### Supporting Code
 
@@ -222,27 +213,29 @@ Each lambda's code is generally structured into five parts.
 
 - `./core/src/errors` holds extensions of the Error class for some custom error handling, as well as some boilerplate code to reformat zod errors to present them to my users in a more readable fashion.
 
-- `./core/src/functions-tests` holds the unit tests for the lambdas, note that vitest is not installed in the `./packages/functions` package. Hence the tests are stored here.
+- `./core/src/functions-tests` holds the unit tests for the lambdas, note that vitest is not installed in the `./packages/functions` package, this is SST best practice to keep it lightweight. Hence the tests are stored here.
 
-- `./core/src/parsing` holds the functionality that validates and sanitises the user inputs and constructs my types objects based off the schema. Again this package is device agnostic and pulls device schemas when it needs them.
+- `./core/src/parsing` holds the functionality that validates and sanitises the user inputs, and constructs my typed objects based off the schema. Again this package is device agnostic and pulls device schemas when it needs them.
 
 - `./core/src/schema` holds the specifics about the device categories I support.
-  I treated it as if it were an external package, because in a real use case it should be so it can be locked down more strongly than the api code. Further all the API code should be agnostic of the device schemas pulling them when needed for easy scalability into supporting more devices.
+  I treated it as if it were an external package, because in a real use case it should be, so it can be locked down more strongly than the api code. Further all the API code should be agnostic of the device schemas pulling them when needed for easy scalability into supporting more devices.
   To support another device you need only add its schema as detailed in the README.txt within.
 
 - `./core/src/util` holds a wrapper for my lambda functions to consistently handle error catching and formatting the http response to send back through the gateway.
 
-### Notable challenges
+### Notable decisions/challenging points
 
-- Designing the code to be agnostic of the device it was working with was an interesting architectual point. Especially as I wanted to support any category with the base device I needed to be carefuly to always be mapping to the correct schema and maintain my typing integrity.
+- Designing the code to be agnostic of the device it was working with was an interesting architectual point. Especially as I wanted to support any category with the base device, I needed to be carefuly to always be mapping to the correct schema and maintain my typing integrity.
 
-- As I chose to expose certain error messages to the user it was a good exercise in handling my errors carefully, to make sure my error messages were helpful, but had no risk of data leakage. This lead to the ValidationError and InternalError extensions. I'll feedback any validation errors but log Internal errors and respond with a generic error message. (I havent actually implemented any logging)
+- As I chose to expose certain error messages to the user it was a good exercise in handling my errors carefully, to make sure my error messages were helpful, but had no risk of data leakage. This lead to the ValidationError and InternalError extensions. I'll feedback any Validation Errors but log Internal Errors and respond with a generic error message. (I havent actually implemented any logging, but I would)
 
-- How to handle conflicting/repeated requests was also an interesting point. Especially in relation to the above - eg. when trying to delete a non-existant device, should I tell the user it wasnt there, or just confirm that there _now_ isn't that device.
+- How to handle conflicting/repeated requests was also an interesting point. Especially in relation to the above - e.g., when trying to delete a non-existant device, should I tell the user it wasnt there, or just confirm that there _now_ isn't that device.
 
-- Input validation and sanitisation was another big concern, as I am putting user input into DynamoDb commands, most of this was easily handles via Zod stripping fields I'm not explicitly allowing and enforcing other restrictions.
+- Input validation and sanitisation was another big concern, as I am putting user input into DynamoDb commands, though most of this was easily handled via Zod stripping fields I'm not explicitly allowing and enforcing other restrictions.
 
 ### Expansion/ Next Steps
+
+- There is an argument for dropping the user id from the device data returned form a saftey standpoint as the user should never interact with it, they dont need it know its there.
 
 - For this to actually work as an IoT system API, there would need to be some way for the device to actually respond to the change to its state in the table. The way I imagined that would fit with my current design would be lambdas triggered by changing data sending the update to the connected device.
 
@@ -254,9 +247,9 @@ Each lambda's code is generally structured into five parts.
 
 ### Known Issues
 
-- The Zod safeParse seems to crash out when the string max length is not adhered to. Wrapping in a try catch does not fix the issue. Strangely it works fine for everything else. It is currently inelegantly handled as an internal server error.
+- The Zod safeParse seems to crash out when the string max length is not adhered to, wrapping in a try catch does not fix the issue. Strangely it works fine for everything else. It is currently handled as an Internal Error.
 
-- Not necessarily an issue, but misspelt fields will just be dropped without notice
+- Not necessarily an issue, but misspelt optional fields in requests will just be stripped without clear notice to the user.
 
 ## The Task Description
 
