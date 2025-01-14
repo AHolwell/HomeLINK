@@ -12,7 +12,7 @@ Following the `getting started` steps below will deploy resources to your AWS ac
 
 If you would rather not deploy the api I will have it hosted at `api.homelink.nuvolaconsulting.co.uk` and will provide you with the credentials for some users.
 
-Note I have manually disabled signups for the hosted version, please use the provided credentials.
+Note I have manually disabled signups for the hosted version, please use the provided credentials. Further the API will be rate limited - not built into IaC
 
 ## Get started
 
