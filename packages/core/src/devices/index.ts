@@ -1,22 +1,23 @@
-// Supporting functionality for the lambdas regarding device management
 import { InternalError, InternalErrors } from "../errors";
 import { RegisterRequest } from "../parsing/schema/requestBodies";
-import { baseDeviceSchema, deviceSchemas } from "./schema";
-import { Device } from "./schema/Device";
+import { baseDeviceSchema, deviceSchemas } from "../schema";
+import { Device, DeviceUpdate } from "../schema/Device";
 
 /**
  * Largely redundant type check that the device satisfies the schema for typechecking
+ *
+ * @param {any} obj the device you want to typecheck
+ * @returns whether the typecheck passed
  */
 export const isDevice = (obj: any): obj is Device => {
   return baseDeviceSchema.safeParse(obj).success;
 };
 
 /**
- * Validates the request body and then constructs the device details
- *to be put into the dynamo table via a device factory mapped from the device category
+ * Constructs a device object from the schema associated with the device category
  *
- * @param event The API gateway event passed into the register lambda
- * @returns A Device object ready to be put into the devices dynamoDB table
+ * @param {RegisterRequest} registerRequest the parsed request to register a device
+ * @returns the device object
  */
 export const createDevice = (registerRequest: RegisterRequest): Device => {
   const schema =
@@ -30,3 +31,26 @@ export const createDevice = (registerRequest: RegisterRequest): Device => {
 
   return device;
 };
+
+/**
+ * Constructs the updateExpression expressionAttributeValues
+ * needed to update the fields in the dynamodb table through the UpdateCommand
+ *
+ * Assumes that the deviceUpdate object is safe
+ *
+ * @param {DeviceUpdate} deviceUpdate object ocntaining the fields to update
+ * @returns the updateExpression and expressionAttributeValues ready for the UpdateCommand
+ */
+export function constructDeviceUpdateExpressions(deviceUpdate: DeviceUpdate) {
+  let updateExpression =
+    "SET " +
+    Object.keys(deviceUpdate)
+      .map((key) => `${key} = :${key}`)
+      .join(", ");
+
+  const expressionAttributeValues = Object.fromEntries(
+    Object.entries(deviceUpdate).map(([key, value]) => [`:${key}`, value]),
+  );
+
+  return { updateExpression, expressionAttributeValues };
+}

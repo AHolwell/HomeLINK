@@ -21,12 +21,14 @@ const dynamoDb = DynamoDBDocumentClient.from(new DynamoDBClient({}));
  *
  * Warning: There is no pagination/limit.
  *
- * @param event the API Gateway Event
+ * @param {APIGatewayProxyEvent} event the API Gateway Event
  * @returns an array of all device objects associated with the user
  */
 export const main = Util.handler(async (event: APIGatewayProxyEvent) => {
+  //Validate + sanitise user input
   const listRequest: ListRequest = parseListRequest(event);
 
+  //Construct Command
   const params: QueryCommandInput = {
     TableName: Resource.Devices.name,
     KeyConditionExpression: "userId = :userId",
@@ -35,9 +37,11 @@ export const main = Util.handler(async (event: APIGatewayProxyEvent) => {
     },
   };
 
+  //Execute command
   const result: QueryCommandOutput = await dynamoDb.send(
     new QueryCommand(params),
   );
 
+  //Return response
   return JSON.stringify(result.Items);
 });

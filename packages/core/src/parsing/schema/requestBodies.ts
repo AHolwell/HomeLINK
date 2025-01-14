@@ -19,7 +19,7 @@ export const registerRequestSchema = z.object({
   deviceName: z.string().optional(),
 });
 
-// We dont want to allow the userId to be parsed from the body, but need it required on the type
+// We dont want to allow the userId to be parsed from the body, but want it required on the type
 export type RegisterRequest = z.infer<typeof registerRequestSchema> & {
   userId: string;
 };

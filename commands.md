@@ -1,32 +1,38 @@
+## Using the API
+
+As they API is fronted by cognito, api testing is done most easily via[AWS API Gateway Test CLI](https://github.com/AnomalyInnovations/aws-api-gateway-cli-test)
+
+The variables needed will be output to the console in dev mode or after deploy.
+
 #### Register a device
 
 ```
 npx aws-api-gateway-cli-test \
-  --username='76c20204-c031-7093-4bb3-d0db792a361b' \
-  --password='MyNewPassw0rd!' \
-  --user-pool-id='eu-west-2_wwABMsyxN' \
-  --app-client-id='4tjmm1mspujnkgrkcko8nnntiq' \
-  --cognito-region='eu-west-2' \
-  --identity-pool-id='eu-west-2:2cc84db5-a550-4e47-a4fe-d26c7d01cd75' \
+  --username='<USER_NAME>' \
+  --password='<PASSWORD>' \
+  --user-pool-id='<USERPOOL_ID>' \
+  --app-client-id='<USERPOOL_CLIENT_ID>' \
+  --cognito-region='<REGION>' \
+  --identity-pool-id='<IDENTITY_POOL>' \
   --invoke-url='https://dev.api.homelink.nuvolaconsulting.co.uk' \
-  --api-gateway-region='eu-west-2' \
+  --api-gateway-region='<REGION>' \
   --path-template='/devices' \
   --method='POST' \
-  --body='{"deviceCategory": "CarbonMonitor", "deviceName": "MyCOMon", "deviceId": "123"}'
+  --body='{"deviceCategory": "CarbonMonitor", "deviceName": "MyCOMonitor - Optional", "deviceId": "123"}'
 ```
 
-#### List all
+#### List all devices
 
 ```
 npx aws-api-gateway-cli-test \
-  --username='76c20204-c031-7093-4bb3-d0db792a361b' \
-  --password='MyNewPassw0rd!' \
-  --user-pool-id='eu-west-2_wwABMsyxN' \
-  --app-client-id='4tjmm1mspujnkgrkcko8nnntiq' \
-  --cognito-region='eu-west-2' \
-  --identity-pool-id='eu-west-2:2cc84db5-a550-4e47-a4fe-d26c7d01cd75' \
+  --username='<USER_NAME>' \
+  --password='<PASSWORD>' \
+  --user-pool-id='<USERPOOL_ID>' \
+  --app-client-id='<USERPOOL_CLIENT_ID>' \
+  --cognito-region='<REGION>' \
+  --identity-pool-id='<IDENTITY_POOL>' \
   --invoke-url='https://dev.api.homelink.nuvolaconsulting.co.uk' \
-  --api-gateway-region='eu-west-2' \
+  --api-gateway-region='<REGION>' \
   --path-template='/devices' \
   --method='GET'
 ```
@@ -35,80 +41,83 @@ npx aws-api-gateway-cli-test \
 
 ```
 npx aws-api-gateway-cli-test \
-  --username='c67292f4-80d1-7005-14d7-63dd1b4056ab' \
-  --password='MyNewPassw0rd!' \
-  --user-pool-id='eu-west-2_wwABMsyxN' \
-  --app-client-id='4tjmm1mspujnkgrkcko8nnntiq' \
-  --cognito-region='eu-west-2' \
-  --identity-pool-id='eu-west-2:2cc84db5-a550-4e47-a4fe-d26c7d01cd75' \
+  --username='<USER_NAME>' \
+  --password='<PASSWORD>' \
+  --user-pool-id='<USERPOOL_ID>' \
+  --app-client-id='<USERPOOL_CLIENT_ID>' \
+  --cognito-region='<REGION>' \
+  --identity-pool-id='<IDENTITY_POOL>' \
   --invoke-url='https://dev.api.homelink.nuvolaconsulting.co.uk' \
-  --api-gateway-region='eu-west-2' \
+  --api-gateway-region='<REGION>' \
   --path-template='/devices/{id}' \
   --method='GET' \
-  --params='{"id": "d06838a0-d0f9-11ef-8182-1b012c422b70"}'
+  --params='{"id": "123"}'
 ```
 
 #### Update a device
 
 ```
 npx aws-api-gateway-cli-test \
-  --username='76c20204-c031-7093-4bb3-d0db792a361b' \
-  --password='MyNewPassw0rd!' \
-  --user-pool-id='eu-west-2_wwABMsyxN' \
-  --app-client-id='4tjmm1mspujnkgrkcko8nnntiq' \
-  --cognito-region='eu-west-2' \
-  --identity-pool-id='eu-west-2:2cc84db5-a550-4e47-a4fe-d26c7d01cd75' \
+  --username='<USER_NAME>' \
+  --password='<PASSWORD>' \
+  --user-pool-id='<USERPOOL_ID>' \
+  --app-client-id='<USERPOOL_CLIENT_ID>' \
+  --cognito-region='<REGION>' \
+  --identity-pool-id='<IDENTITY_POOL>' \
   --invoke-url='https://dev.api.homelink.nuvolaconsulting.co.uk' \
-  --api-gateway-region='eu-west-2' \
+  --api-gateway-region='<REGION>' \
   --path-template='/devices/{id}' \
   --method='PUT' \
-  --params='{"id": "1"}' \
-  --body='{"colour": "Red"}'
+  --params='{"id": "123"}' \
+  --body='{"alarmThreshold": 800}'
 ```
 
 #### Remove a device
 
 ```
 npx aws-api-gateway-cli-test \
-  --username='c67292f4-80d1-7005-14d7-63dd1b4056ab' \
-  --password='MyNewPassw0rd!' \
-  --user-pool-id='eu-west-2_wwABMsyxN' \
-  --app-client-id='4tjmm1mspujnkgrkcko8nnntiq' \
-  --cognito-region='eu-west-2' \
-  --identity-pool-id='eu-west-2:2cc84db5-a550-4e47-a4fe-d26c7d01cd75' \
+  --username='<USER_NAME>' \
+  --password='<PASSWORD>' \
+  --user-pool-id='<USERPOOL_ID>' \
+  --app-client-id='<USERPOOL_CLIENT_ID>' \
+  --cognito-region='<REGION>' \
+  --identity-pool-id='<IDENTITY_POOL>' \
   --invoke-url='https://dev.api.homelink.nuvolaconsulting.co.uk' \
-  --api-gateway-region='eu-west-2' \
+  --api-gateway-region='<REGION>' \
   --path-template='/devices/{id}' \
   --method='DELETE' \
-  --params='{"id": "d969e820-d0fb-11ef-bd87-cf2f6d616065"}'
+  --params='{"id": "123"}'
 ```
+
+## Setting up a user
 
 #### Add a user
 
 ```
 aws cognito-idp sign-up \
-  --region eu-west-2 \
-  --client-id 4tjmm1mspujnkgrkcko8nnntiq \
-  --username user1@example.com \
-  --password MyNewPassw0rd!
+  --region <REGION> \
+  --client-id <USERPOOL_CLIENT_ID> \
+  --username user@example.com \
+  --password <PASSWORD>
+  --profile <PROFILE_NAME>
 ```
+
+#### Confirm their password
 
 ```
 aws cognito-idp admin-confirm-sign-up \
-  --region eu-west-2 \
-  --user-pool-id eu-west-2_wwABMsyxN \
-  --username user1@example.com \
-  --profile adminProfile
+  --region <REGION> \
+  --user-pool-id <USERPOOL_ID> \
+  --username user@example.com \
+  --profile <PROFILE_NAME>
 ```
 
-#### Params
+#### Retrieve the username
 
-IdentityPool: eu-west-2:2cc84db5-a550-4e47-a4fe-d26c7d01cd75
-Region: eu-west-2
-UserPoolClientId: 4tjmm1mspujnkgrkcko8nnntiq
-UserPoolId: eu-west-2_wwABMsyxN
+Note that the username you define here is not the username required by the Gateway test cli above, retireve the uuid username with
 
-#### Users
-
-76c20204-c031-7093-4bb3-d0db792a361b
-c67292f4-80d1-7005-14d7-63dd1b4056ab
+```
+admin-get-user
+--user-pool-id <USERPOOL_ID>
+--username user@example.com
+```

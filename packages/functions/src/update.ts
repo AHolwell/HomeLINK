@@ -21,23 +21,28 @@ import {
   parseUpdateRequest,
 } from "@homelink/core/parsing";
 import { GenericRequest } from "@homelink/core/parsing/schema/requestBodies";
-import { DeviceUpdate } from "@homelink/core/devices/schema/Device";
+import { constructDeviceUpdateExpressions } from "@homelink/core/devices";
+import { DeviceUpdate } from "@homelink/core/schema/Device";
 
+// Set up client outside handler for persistance between warm invocations
 const dynamoDb = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 
 /**
  * Update endpoint lambda handler
  *
- * Accepts a stringified body object of the fields the user is updating
- * eg.{colour: red, intensity: 70}
+ * Accepts a stringified body JSON of the fields the user is updating
+ * eg.'{"colour": "red", "intensity": 70}'
  *
- * @param event the API Gateway Event
+ * @param {APIGatewayProxyEvent} event the API Gateway Event
  * @returns true when the item has been updated
  */
 export const main = Util.handler(async (event: APIGatewayProxyEvent) => {
+  // Get the current entry details
+
+  //Validate + sanitise user input
   const genericRequest: GenericRequest = parseGenericRequest(event);
 
-  // Get the current entry.
+  //Construct command
   const getParams: GetCommandInput = {
     TableName: Resource.Devices.name,
 
@@ -47,8 +52,10 @@ export const main = Util.handler(async (event: APIGatewayProxyEvent) => {
     },
   };
 
+  //Execute command
   const getResult = await dynamoDb.send(new GetCommand(getParams));
 
+  //Check database response
   if (!getResult.Item) {
     throw new ValidationError(
       ValidationErrors.ItemNotFound,
@@ -60,14 +67,17 @@ export const main = Util.handler(async (event: APIGatewayProxyEvent) => {
     throw new InternalError(InternalErrors.DeviceCategoryNotFound);
   }
 
+  // Update the entry details as requested
+
+  //Validate + sanitise user input - depends on device catefory
   const deviceUpdate: DeviceUpdate = parseUpdateRequest(
     event,
     getResult.Item.deviceCategory,
   );
 
-  // Update the item with new values
+  //Construct command
   const { updateExpression, expressionAttributeValues } =
-    Util.constructUpdateExpressions(deviceUpdate);
+    constructDeviceUpdateExpressions(deviceUpdate);
 
   const updateParams: UpdateCommandInput = {
     TableName: Resource.Devices.name,
@@ -79,7 +89,9 @@ export const main = Util.handler(async (event: APIGatewayProxyEvent) => {
     ExpressionAttributeValues: expressionAttributeValues,
   };
 
+  //Execute command
   await dynamoDb.send(new UpdateCommand(updateParams));
 
+  //Return response
   return JSON.stringify({ status: true });
 });

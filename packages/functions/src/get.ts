@@ -21,14 +21,16 @@ const dynamoDb = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 /**
  * Get endpoint lambda handler
  *
- * Pulls the Id from the routing, and attempts to retireve that item, and present details to user
+ * Parses the Id from the routing, and attempts to retireve that item, and present details to user
  *
- * @param event the API Gateway Event
- * @returns the full item object
+ * @param {APIGatewayProxyEvent} event the API Gateway Event
+ * @returns the full item object stringified
  */
 export const main = Util.handler(async (event: APIGatewayProxyEvent) => {
+  //Validate + sanitise user input
   const genericRequest: GenericRequest = parseGenericRequest(event);
 
+  //Construct command
   const params: GetCommandInput = {
     TableName: Resource.Devices.name,
     Key: {
@@ -37,8 +39,10 @@ export const main = Util.handler(async (event: APIGatewayProxyEvent) => {
     },
   };
 
+  //Execute command
   const result: GetCommandOutput = await dynamoDb.send(new GetCommand(params));
 
+  //Check database response
   if (!result.Item) {
     throw new ValidationError(
       ValidationErrors.ItemNotFound,
@@ -46,5 +50,6 @@ export const main = Util.handler(async (event: APIGatewayProxyEvent) => {
     );
   }
 
+  //Return response
   return JSON.stringify(result.Item);
 });

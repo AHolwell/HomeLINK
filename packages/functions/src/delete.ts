@@ -22,17 +22,19 @@ const dynamoDb = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 /**
  * Delete endpoint lambda handler
  *
- * Pulls the Id from the routing, and attempts to delete that item from the table if it exists and is associated with user.
+ * Pulls the Id from the routing, and attempts to delete that item from the table if it exists.
  *
  * Request the return values to confirm the item existed before deletion, without it would return successful
  * if the item never existed - There is an argument for that being desired/acceptable behavior.
  *
- * @param event the API Gateway Event
+ * @param {APIGatewayProxyEvent} event the API Gateway Event
  * @returns true when sucessfull
  */
 export const main = Util.handler(async (event: APIGatewayProxyEvent) => {
+  //Validate + sanitise user input
   const genericRequest: GenericRequest = parseGenericRequest(event);
 
+  //Construct command
   const params: DeleteCommandInput = {
     TableName: Resource.Devices.name,
     Key: {
@@ -42,16 +44,20 @@ export const main = Util.handler(async (event: APIGatewayProxyEvent) => {
     ReturnValues: "ALL_OLD",
   };
 
+  //Execute command
   const response: DeleteCommandOutput = await dynamoDb.send(
     new DeleteCommand(params),
   );
 
+  //Check database response
   if (!response.Attributes) {
+    // There is a small security argument for just returning true if the item never existed
     throw new ValidationError(
       ValidationErrors.ItemNotFound,
       StatusCode.NotFound,
     );
   }
 
+  //Return response
   return JSON.stringify({ status: true });
 });

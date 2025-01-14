@@ -14,10 +14,11 @@ import { RegisterRequest } from "@homelink/core/parsing/schema/requestBodies";
 import {
   InternalError,
   InternalErrors,
+  StatusCode,
   ValidationError,
   ValidationErrors,
 } from "@homelink/core/errors";
-import { Device } from "@homelink/core/devices/schema/Device";
+import { Device } from "@homelink/core/schema/Device";
 
 // Set up client outside handler for persistance between warm invocations
 const dynamoDb = DynamoDBDocumentClient.from(new DynamoDBClient({}));
@@ -27,35 +28,36 @@ const dynamoDb = DynamoDBDocumentClient.from(new DynamoDBClient({}));
  *
  * Accepts a body with an object containing the modelType and optional deviceName
  *
- * @param event the API Gateway Event
+ * @param {APIGatewayProxyEvent} event the API Gateway Event
  * @returns the full details of the registered item
  */
 export const main = Util.handler(async (event: APIGatewayProxyEvent) => {
-  // Make safe the user input
+  //Validate + sanitise user input
   const registerRequest: RegisterRequest = parseRegisterRequest(event);
 
-  // Construct the device object
+  //Construct command
   const device: Device = createDevice(registerRequest);
 
-  // Put it in the table
   const params: PutCommandInput = {
     TableName: Resource.Devices.name,
     Item: device,
     ConditionExpression: "attribute_not_exists(deviceId)",
   };
 
+  //Execute command
   try {
-    const result: PutCommandOutput = await dynamoDb.send(
-      new PutCommand(params),
-    );
+    await dynamoDb.send(new PutCommand(params));
   } catch (error: any) {
     if (error?.message === "The conditional request failed")
-      throw new ValidationError(ValidationErrors.ItemAlreadyExists);
+      throw new ValidationError(
+        ValidationErrors.ItemAlreadyExists,
+        StatusCode.Conflict,
+      );
     throw new InternalError(
       error?.message ?? InternalErrors.DynamoCommandFailed,
     );
   }
 
-  // Return the device details if successful
+  //Return response
   return JSON.stringify(device);
 });
